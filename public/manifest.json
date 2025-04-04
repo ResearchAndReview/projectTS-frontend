@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "comutrans",
+  "version": "0.0.1",
+  "permissions": ["contextMenus", "tabs"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background/index.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/index.js"]
+    }
+  ],
+  "action": {
+    "default_title": "comutrans"
+  }
+}
