@@ -2,11 +2,7 @@ import { Rect } from '@/types';
 
 type CropImage = (dataUrl: string, rect: Rect, dpr?: number) => Promise<string>;
 
-export const cropImage: CropImage = (
-  dataUrl,
-  rect,
-  dpr = window.devicePixelRatio
-) =>
+export const cropImage: CropImage = (dataUrl, rect, dpr = window.devicePixelRatio) =>
   new Promise((resolve) => {
     const img = new Image();
     img.src = dataUrl;
@@ -26,7 +22,7 @@ export const cropImage: CropImage = (
         0,
         0,
         rect.width * dpr,
-        rect.height * dpr
+        rect.height * dpr,
       );
 
       resolve(canvas.toDataURL('image/png'));

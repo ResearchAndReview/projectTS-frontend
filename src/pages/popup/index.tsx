@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom/client';
-import { Main } from './main';
+import App from './app';
 
-const rootId = 'comutrans-root';
+const rootId = 'root';
 
 let rootElem = document.getElementById(rootId);
 
@@ -21,4 +21,4 @@ if (!rootElem) {
   document.body.appendChild(rootElem);
 }
 
-ReactDOM.createRoot(rootElem).render(<Main />);
+ReactDOM.createRoot(rootElem).render(<App />);

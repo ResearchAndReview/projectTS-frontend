@@ -1,13 +1,18 @@
-import { captureVisibleTab } from '@back/logic/capture';
-import { OnContextMenuClicked, OnRuntimeMessage } from './types';
 import { Message } from '@/types';
+import { captureVisibleTab } from '@back/logic/capture';
+import { handleTaskMessages } from '../tasks';
+import { OnContextMenuClicked, OnRuntimeMessage } from './types';
 
-const onRuntimeMessage: OnRuntimeMessage = (msg: Message) => {
+const onRuntimeMessage: OnRuntimeMessage = (msg: Message, sender) => {
+  if (handleTaskMessages(msg, sender)) return;
+
   switch (msg.type) {
-    case 'CAPTURE_SCREENSHOT':
+    case 'CAPTURE_SCREENSHOT': {
       captureVisibleTab(msg.payload.rect);
       break;
+    }
     default:
+      console.warn('Unhandled message:', msg);
   }
 };
 

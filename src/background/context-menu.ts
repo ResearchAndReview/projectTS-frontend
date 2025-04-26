@@ -6,7 +6,5 @@ const enterDragMode: chrome.contextMenus.CreateProperties = {
 };
 
 export const registerContextMenu = () => {
-  chrome.contextMenus.removeAll(() =>
-    chrome.contextMenus.create(enterDragMode)
-  );
+  chrome.contextMenus.removeAll(() => chrome.contextMenus.create(enterDragMode));
 };

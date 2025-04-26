@@ -5,17 +5,13 @@ export const captureVisibleTab = (rect: Rect) => {
     const tab = tabs[0];
     if (!tab.id || !tab.windowId) return;
 
-    chrome.tabs.captureVisibleTab(
-      tab.windowId,
-      { format: 'png' },
-      (dataUrl) => {
-        if (!dataUrl) return;
+    chrome.tabs.captureVisibleTab(tab.windowId, { format: 'png' }, (dataUrl) => {
+      if (!dataUrl) return;
 
-        chrome.tabs.sendMessage(tab.id!, {
-          type: 'SCREENSHOT_DATA',
-          payload: { rect, dataUrl },
-        } as Message);
-      }
-    );
+      chrome.tabs.sendMessage(tab.id!, {
+        type: 'SCREENSHOT_DATA',
+        payload: { rect, dataUrl },
+      } as Message);
+    });
   });
 };
