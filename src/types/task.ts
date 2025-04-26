@@ -11,10 +11,7 @@ export interface Caption {
 
 export interface Task {
   id: string;
-  context: {
-    sessionId: string;
-    url: string;
-  };
+  context: { sessionId: string; url: string };
   status: TaskStatus;
   image: string;
   rect: Rect;
