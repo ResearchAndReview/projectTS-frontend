@@ -9,7 +9,7 @@ export default defineConfig({
     emptyOutDir: false,
     rollupOptions: {
       input: {
-        popup: resolve(__dirname, 'src/pages/popup/index.tsx'),
+        popup: resolve(__dirname, 'src/popup/index.tsx'),
       },
       output: {
         entryFileNames: '[name]/index.js',

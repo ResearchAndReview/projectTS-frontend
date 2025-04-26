@@ -7,7 +7,8 @@ export const commonConfig = {
     alias: {
       '@': resolve(__dirname, 'src'),
       '@back': resolve(__dirname, 'src/background'),
-      '@content': resolve(__dirname, 'src/pages/content'),
+      '@content': resolve(__dirname, 'src/content'),
+      '@popup': resolve(__dirname, 'src/popup'),
     },
   },
 };
