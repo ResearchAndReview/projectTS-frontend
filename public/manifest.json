@@ -16,6 +16,6 @@
   ],
   "action": {
     "default_title": "comutrans",
-    "default_popup": "popup/index.html"
+    "default_popup": "index.html"
   }
 }

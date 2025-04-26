@@ -1,19 +1,15 @@
 import { Message } from '@/types';
-import { captureVisibleTab } from '@back/logic/capture';
-import { handleTaskMessages } from '../tasks';
-import { OnContextMenuClicked, OnRuntimeMessage } from './types';
+import { handleContentMessages, handlePopupMessages } from './handlers';
 
-const onRuntimeMessage: OnRuntimeMessage = (msg: Message, sender) => {
-  if (handleTaskMessages(msg, sender)) return;
+// Event handling functions
 
-  switch (msg.type) {
-    case 'CAPTURE_SCREENSHOT': {
-      captureVisibleTab(msg.payload.rect);
-      break;
-    }
-    default:
-      console.warn('Unhandled message:', msg);
-  }
+type OnContextMenuClicked = (info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) => void;
+type OnRuntimeMessage = Parameters<typeof chrome.runtime.onMessage.addListener>[0];
+
+const onRuntimeMessage: OnRuntimeMessage = (msg: Message, sender, sendResponse) => {
+  if (handleContentMessages(msg, sender)) return;
+  if (handlePopupMessages(msg, sendResponse)) return;
+  console.warn('Unhandled message:', msg);
 };
 
 const onContextMenuClicked: OnContextMenuClicked = (info, tab) => {
@@ -21,6 +17,8 @@ const onContextMenuClicked: OnContextMenuClicked = (info, tab) => {
     chrome.tabs.sendMessage(tab.id, { type: 'ENTER_DRAG_MODE' } as Message);
   }
 };
+
+// Function to register event handlers
 
 export const registerMessageListeners = () => {
   chrome.runtime.onMessage.removeListener(onRuntimeMessage);

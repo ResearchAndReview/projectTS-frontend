@@ -34,4 +34,8 @@ export interface MessageMap {
     payload: Task[];
     meta: { from: 'background'; to: 'content' };
   };
+  GET_ALL_TASKS: {
+    payload: undefined;
+    meta: { from: 'popup'; to: 'background' };
+  };
 }
