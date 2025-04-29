@@ -39,7 +39,7 @@ interface RegionProps {
 }
 
 const DraggedRegion: React.FC<RegionProps> = ({ rect, children }) => {
-  const top = rect.y;
+  const top = rect.y + scrollY;
   const left = rect.x;
 
   return (
@@ -76,12 +76,12 @@ const CaptionBox: React.FC<CaptionProps> = ({ rect, translation }) => {
 
 const Caption = styled.div`
   position: absolute;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid #aaa;
   color: black;
   font-size: 13px;
   padding: 2px 4px;
-  border-radius: 4px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
   pointer-events: auto;
 `;
 
@@ -103,7 +103,7 @@ const Popup = styled.div`
   color: black;
   font-size: 13px;
   padding: 4px 8px;
-  border-radius: 6px;
+  border-radius: 2px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   white-space: nowrap;
   pointer-events: none;

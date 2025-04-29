@@ -30,21 +30,39 @@ const dummyApi = () => {
     captions: [
       {
         id: '1',
-        rect: { x: 10, y: 20, width: 100, height: 30 },
-        text: 'Hello',
-        translation: '안녕하세요',
-      },
-      {
-        id: '2',
-        rect: { x: 120, y: 50, width: 80, height: 25 },
-        text: 'World',
-        translation: '세계',
+        rect: { x: 267, y: 75, width: 16, height: 30 },
+        text: 'さび',
+        translation: '사비',
       },
       {
         id: '3',
-        rect: { x: 50, y: 100, width: 150, height: 40 },
-        text: 'How are you?',
-        translation: '어떻게 지내?',
+        rect: { x: 467, y: 47, width: 108, height: 174 },
+        text: '筆坊は寒い日も布団に入ってはくれぬ。',
+        translation: '후데보는 추운 날에도 이불에 들어와 주지 않는다.',
+      },
+      {
+        id: '5',
+        rect: { x: 498, y: 306, width: 56, height: 74 },
+        text: '布団に\nしかも',
+        translation: '이불에\n게다가',
+      },
+      {
+        id: '6',
+        rect: { x: 111, y: 497, width: 60, height: 142 },
+        text: '祭壇みたいに\nされたりする',
+        translation: '제단처럼\n되기도 한다',
+      },
+      {
+        id: '7',
+        rect: { x: 518, y: 506, width: 32, height: 148 },
+        text: '各種並べられ',
+        translation: '각종이 늘어놓이고',
+      },
+      {
+        id: '8',
+        rect: { x: 145, y: 71, width: 48, height: 110 },
+        text: '結界',
+        translation: '결계',
       },
     ],
   };

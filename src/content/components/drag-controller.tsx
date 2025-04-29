@@ -28,7 +28,7 @@ export const DragController = ({ onComplete }: Props) => {
     };
 
     const onMouseUp = () => {
-      if (rect) onComplete({ ...rect, x: rect.x + window.scrollX, y: rect.y + window.scrollY });
+      if (rect) onComplete(rect);
       setStart(null);
       setCurrent(null);
     };

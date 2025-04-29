@@ -7,6 +7,8 @@ export const cropImage: CropImage = (dataUrl, rect, dpr = window.devicePixelRati
     const img = new Image();
     img.src = dataUrl;
 
+    console.log(dataUrl, rect, dpr);
+
     img.onload = () => {
       const canvas = document.createElement('canvas');
       canvas.width = rect.width * dpr;
@@ -30,8 +32,8 @@ export const cropImage: CropImage = (dataUrl, rect, dpr = window.devicePixelRati
   });
 
 export const afterPaint = (callback: () => void) => {
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
       callback();
     });
   });

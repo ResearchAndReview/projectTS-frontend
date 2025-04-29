@@ -5,13 +5,13 @@ import { ExtractPayload, Message, Rect, Task } from '@/types';
 
 const captureScreenshot = (rect: Rect) => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const tab = tabs[0];
-    if (!tab.id || !tab.windowId) return;
+    const { id, windowId } = tabs[0];
+    if (!id || !windowId) return;
 
-    chrome.tabs.captureVisibleTab(tab.windowId, { format: 'png' }, (dataUrl) => {
+    chrome.tabs.captureVisibleTab(windowId, { format: 'png' }, (dataUrl) => {
       if (!dataUrl) return;
 
-      chrome.tabs.sendMessage(tab.id!, {
+      chrome.tabs.sendMessage(id, {
         type: 'SCREENSHOT_DATA',
         payload: { rect, dataUrl },
       } as Message);
