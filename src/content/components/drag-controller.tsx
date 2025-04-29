@@ -1,32 +1,30 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { Point, Rect } from '@/types';
-import { Box, Overlay } from './ui';
+import styled from '@emotion/styled';
 
 interface Props {
   onComplete: (rect: Rect) => void;
 }
 
 export const DragController = ({ onComplete }: Props) => {
-  const [start, setStart] = React.useState<Point | null>(null);
-  const [current, setCurrent] = React.useState<Point | null>(null);
+  const [start, setStart] = useState<Point | null>(null);
+  const [current, setCurrent] = useState<Point | null>(null);
 
   const rect = calcRect(start, current);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const onMouseDown = (e: MouseEvent) => {
       if (e.button !== 0) return;
       const x = e.pageX - window.scrollX;
       const y = e.pageY - window.scrollY;
       setStart({ x, y });
-      setCurrent({ x, y });
     };
 
     const onMouseMove = (e: MouseEvent) => {
-      if (start) {
-        const x = e.pageX - window.scrollX;
-        const y = e.pageY - window.scrollY;
-        setCurrent({ x, y });
-      }
+      if (!start) return;
+      const x = e.pageX - window.scrollX;
+      const y = e.pageY - window.scrollY;
+      setCurrent({ x, y });
     };
 
     const onMouseUp = () => {
@@ -49,6 +47,8 @@ export const DragController = ({ onComplete }: Props) => {
   return <Overlay>{rect && <Box rect={rect} />}</Overlay>;
 };
 
+// Utility functions
+
 const calcRect = (start: Point | null, current: Point | null): Rect | null => {
   if (!start || !current) return null;
   if (start.x === current.x && start.y === current.y) return null;
@@ -60,3 +60,28 @@ const calcRect = (start: Point | null, current: Point | null): Rect | null => {
 
   return { x, y, width, height };
 };
+
+// Styled components
+
+const Overlay = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  cursor: crosshair;
+  user-select: none;
+  background-color: transparent;
+`;
+
+const Box = styled.div<{ rect: Rect }>`
+  position: absolute;
+  top: ${({ rect: { y } }) => y}px;
+  left: ${({ rect: { x } }) => x}px;
+  width: ${({ rect: { width } }) => width}px;
+  height: ${({ rect: { height } }) => height}px;
+
+  border: 1px dashed #7300ff;
+  background-color: rgba(66, 165, 245, 0.15);
+
+  pointer-events: none;
+  z-index: 1000000;
+`;

@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Task } from '@/types/task';
 import { Content } from './components/content';
+import { Footer } from './components/footer';
 import { Header } from './components/header';
 
 export default function App() {
+  const [filter, setFilter] = useState<string>('all');
   const [tasks, setTasks] = useState<Task[]>([]);
 
   useEffect(() => {
@@ -17,7 +19,8 @@ export default function App() {
   return (
     <div>
       <Header />
-      <Content tasks={tasks} />
+      <Content tasks={tasks} filter={filter} setFilter={setFilter} />
+      <Footer />
     </div>
   );
 }

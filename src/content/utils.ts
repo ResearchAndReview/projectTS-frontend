@@ -28,3 +28,11 @@ export const cropImage: CropImage = (dataUrl, rect, dpr = window.devicePixelRati
       resolve(canvas.toDataURL('image/png'));
     };
   });
+
+export const afterPaint = (callback: () => void) => {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      callback();
+    });
+  });
+};

@@ -1,19 +1,20 @@
-import React from 'react';
+import { useMemo, useState } from 'react';
 import { Message, Rect, Task } from '@/types';
-import { DragController } from '@content/components/drag-controller';
-import { afterPaint } from '@content/utils';
-import { TranslationOverlay } from '../components/overlay';
-import { useEscape, useMessageRouter } from '../hooks';
-import { useTaskSync } from '../hooks/task-sync';
+import { DragController, TranslationOverlay } from '../components';
+import { useEscape, useMessageRouter, useSessionId, useTaskSync } from '../hooks';
+import { afterPaint } from '../utils';
+import { createMessageHandlers } from './message-handler';
 import { DragState } from './types';
-import { createMessageHandlers } from './utils';
 
 export const Main = () => {
-  const [state, setState] = React.useState<DragState>('IDLE');
-  const [tasks, setTasks] = React.useState<Task[]>([]);
-  const [sessionId] = React.useState<string>(crypto.randomUUID());
+  const [state, setState] = useState<DragState>('IDLE');
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const sessionId = useSessionId();
 
-  const messageHandlers = createMessageHandlers(setState, setTasks, sessionId);
+  const messageHandlers = useMemo(
+    () => createMessageHandlers(setState, setTasks, sessionId),
+    [sessionId],
+  );
 
   useTaskSync(sessionId);
   useMessageRouter(messageHandlers);

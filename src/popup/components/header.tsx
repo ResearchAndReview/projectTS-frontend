@@ -23,6 +23,26 @@ const Logo = styled.div`
   }
 `;
 
+const Tabs = styled.div`
+  display: flex;
+  border-bottom: 1px solid #dde2e9;
+`;
+
+const Tab = styled.div`
+  border: none;
+  background-color: transparent;
+
+  font-size: 15px;
+  color: #485465;
+  padding: 12px 24px;
+  font-weight: semibold;
+
+  &.active {
+    color: #7300ff;
+    border-bottom: 3px solid #7300ff;
+  }
+`;
+
 export const Header = () => {
   return (
     <div>
@@ -31,7 +51,9 @@ export const Header = () => {
         <span>comu</span>
         <span>trans</span>
       </Logo>
-      {/* Tabs */}
+      <Tabs>
+        <Tab className="active">STATUS</Tab>
+      </Tabs>
     </div>
   );
 };
