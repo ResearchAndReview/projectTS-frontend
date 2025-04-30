@@ -38,4 +38,8 @@ export interface MessageMap {
     payload: undefined;
     meta: { from: 'popup'; to: 'background' };
   };
+  GET_ALL_TASKS_RESPONSE: {
+    payload: Task[];
+    meta: { from: 'background'; to: 'popup' };
+  };
 }

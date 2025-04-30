@@ -44,7 +44,7 @@ const submitTask = ({
   processTask(tabId, task);
 };
 
-const requestTasks = ({
+const requestTasks = async ({
   payload: { sessionId },
   tabId,
 }: {
@@ -53,16 +53,16 @@ const requestTasks = ({
 }) => {
   chrome.tabs.sendMessage(tabId, {
     type: 'TASKS_SYNC',
-    payload: getTasks(sessionId),
+    payload: await getTasks(sessionId),
   });
 };
 
 // Content message handler (call appropriate logic for each message)
 
-export const handleContentMessages = (
+export const handleContentMessages = async (
   msg: Message,
   sender: chrome.runtime.MessageSender,
-): boolean => {
+): Promise<boolean> => {
   const tabId = sender.tab?.id;
   const url = sender.url;
 
@@ -81,7 +81,7 @@ export const handleContentMessages = (
       return true;
 
     case 'REQUEST_TASKS': {
-      requestTasks({ payload: msg.payload, tabId });
+      await requestTasks({ payload: msg.payload, tabId });
       return true;
     }
 

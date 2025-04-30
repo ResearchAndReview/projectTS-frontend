@@ -1,20 +1,12 @@
-import { useEffect, useState } from 'react';
-import { Task } from '@/types/task';
+import { useState } from 'react';
 import { Content } from './components/content';
 import { Footer } from './components/footer';
 import { Header } from './components/header';
+import { useTasks } from './hooks';
 
 export default function App() {
   const [filter, setFilter] = useState<string>('all');
-  const [tasks, setTasks] = useState<Task[]>([]);
-
-  useEffect(() => {
-    chrome.runtime.sendMessage({ type: 'GET_ALL_TASKS' }, (response) => {
-      if (response) {
-        setTasks(response);
-      }
-    });
-  }, []);
+  const { tasks } = useTasks();
 
   return (
     <div>

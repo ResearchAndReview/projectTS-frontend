@@ -47,7 +47,7 @@ const Placeholder = styled.div`
   padding: 16px 24px;
 `;
 
-const types = ['all', 'error', 'complete', 'pending'] as const;
+const types = ['all', 'success', 'pending', 'error'] as const;
 
 export const Content = ({
   tasks,

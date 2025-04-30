@@ -1,14 +1,13 @@
 import { Message } from '@/types';
-import { handleContentMessages, handlePopupMessages } from './handlers';
+import { handleContentMessages, registerPopupPortHandler } from './handlers';
 
 // Event handling functions
 
 type OnContextMenuClicked = (info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) => void;
 type OnRuntimeMessage = Parameters<typeof chrome.runtime.onMessage.addListener>[0];
 
-const onRuntimeMessage: OnRuntimeMessage = (msg: Message, sender, sendResponse) => {
-  if (handleContentMessages(msg, sender)) return;
-  if (handlePopupMessages(msg, sendResponse)) return;
+const onRuntimeMessage: OnRuntimeMessage = async (msg: Message, sender) => {
+  if (await handleContentMessages(msg, sender)) return;
   console.warn('Unhandled message:', msg);
 };
 
@@ -26,4 +25,6 @@ export const registerMessageListeners = () => {
 
   chrome.contextMenus.onClicked.removeListener(onContextMenuClicked);
   chrome.contextMenus.onClicked.addListener(onContextMenuClicked);
+
+  registerPopupPortHandler();
 };
