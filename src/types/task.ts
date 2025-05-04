@@ -12,7 +12,7 @@ export interface Caption {
 export interface Task {
   id: string;
   status: TaskStatus;
-  image: Blob;
+  image: string;
   rect: Rect;
   captions: Caption[];
 }

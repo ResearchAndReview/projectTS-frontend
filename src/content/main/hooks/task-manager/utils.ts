@@ -1,10 +1,10 @@
-import { Rect, TaskPollResponse } from '@/types';
+import { Rect, Task, TaskPollResponse } from '@/types';
 import { sendRuntimeMessage } from '@/utils/message';
 
 /**
  * Submits the cropped image and returns the created task ID.
  */
-export const createTask = async (image: Blob) => {
+export const createTask = async (image: Task['image']) => {
   const { taskId } = await sendRuntimeMessage({
     type: 'CREATE_TASK',
     payload: { image },
@@ -43,13 +43,13 @@ export const requestScreenshot = async (rect: Rect) => {
  * @param dataUrl - The source image as a data URL (e.g., from a screenshot).
  * @param rect - The rectangular region to crop { x, y, width, height }.
  * @param dpr - (Optional) Device pixel ratio to handle high-DPI screens (defaults to window.devicePixelRatio).
- * @returns A Promise that resolves with the cropped image as a Blob.
+ * @returns A Promise that resolves with the cropped image.
  */
 const cropImage = (
   dataUrl: string,
   rect: Rect,
   dpr: number = window.devicePixelRatio,
-): Promise<Blob> =>
+): Promise<Task['image']> =>
   new Promise((resolve, reject) => {
     const img = new Image();
     img.src = dataUrl;
@@ -72,10 +72,12 @@ const cropImage = (
         rect.height * dpr,
       );
 
-      canvas.toBlob((blob) => {
-        if (blob) resolve(blob);
-        reject(new Error('cropImage: failed to create a blob.'));
-      }, 'image/png');
+      try {
+        const dataUrl = canvas.toDataURL('image/png');
+        resolve(dataUrl);
+      } catch {
+        reject(new Error('cropImage: failed to create a data URL.'));
+      }
     };
   });
 

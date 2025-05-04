@@ -13,7 +13,7 @@ export interface MessageMap {
     meta: { from: 'content'; to: 'background' };
   };
   CREATE_TASK: {
-    payload: { image: Blob };
+    payload: { image: Task['image'] };
     response: { taskId: string };
     meta: { from: 'content'; to: 'background' };
   };

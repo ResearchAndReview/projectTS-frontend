@@ -1,4 +1,4 @@
-import { Message } from '@/types';
+import { Message, Task } from '@/types';
 
 type SendResponse = Parameters<Parameters<typeof chrome.runtime.onMessage.addListener>[0]>[2];
 
@@ -9,15 +9,11 @@ const captureScreenshot = async (windowId: number, sendResponse: SendResponse) =
   sendResponse({ screenshot: dataUrl });
 };
 
-const createTask = async (image: Blob, sendResponse: SendResponse) => {
-  console.log('CREATE_TASK received', image);
-
+const createTask = async (_image: Task['image'], sendResponse: SendResponse) => {
   sendResponse({ taskId: 'hardcoded-id-for-test' });
 };
 
-const pollTask = async (taskId: string, sendResponse: SendResponse) => {
-  console.log('POLL_TASK received', taskId);
-
+const pollTask = async (_taskId: string, sendResponse: SendResponse) => {
   sendResponse({
     status: 'success',
     captions: [
