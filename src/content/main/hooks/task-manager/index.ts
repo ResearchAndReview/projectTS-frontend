@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Rect, Task } from '@/types';
-import { createTask, pollTask, requestScreenshot } from './api';
-import { afterPaint } from './utils';
+import { afterPaint, createTask, pollTask, requestScreenshot } from './utils';
 
 export const useTaskManager = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
