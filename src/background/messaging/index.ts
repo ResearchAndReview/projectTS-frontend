@@ -1,5 +1,5 @@
 import { Message } from '@/types';
-import { handleContentMessages, registerPopupPortHandler } from './handlers';
+import { handleContentMessages } from './handlers';
 
 // Event handling functions
 
@@ -27,6 +27,4 @@ export const registerMessageListeners = () => {
 
   chrome.contextMenus.onClicked.removeListener(onContextMenuClicked);
   chrome.contextMenus.onClicked.addListener(onContextMenuClicked);
-
-  registerPopupPortHandler();
 };
