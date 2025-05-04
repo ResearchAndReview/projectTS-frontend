@@ -32,16 +32,16 @@ const Button = styled.button`
   }
 `;
 
-const Tasks = styled.li`
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 가로로 4칸 */
+// const Tasks = styled.li`
+//   display: grid;
+//   grid-template-columns: repeat(4, 1fr); /* 가로로 4칸 */
 
-  img {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-  }
-`;
+//   img {
+//     width: 100%;
+//     aspect-ratio: 1 / 1;
+//     object-fit: cover;
+//   }
+// `;
 
 const Placeholder = styled.div`
   padding: 16px 24px;
@@ -91,12 +91,15 @@ export const Content = ({
       </Top>
       {filteredTasks.length === 0 && <Placeholder>No tasks were found.</Placeholder>}
       {filteredTasks.length !== 0 && (
+        <Placeholder>{filteredTasks.length} tasks were found.</Placeholder>
+      )}
+      {/* {filteredTasks.length !== 0 && (
         <Tasks>
           {filteredTasks.map((task) => (
             <img src={task.image} className="thumbnail" id={`task-${task.id}`} />
           ))}
         </Tasks>
-      )}
+      )} */}
     </div>
   );
 };

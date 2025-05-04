@@ -1,13 +1,11 @@
 import { Rect } from '@/types';
 
-type CropImage = (dataUrl: string, rect: Rect, dpr?: number) => Promise<string>;
+type CropImage = (dataUrl: string, rect: Rect, dpr?: number) => Promise<Blob>;
 
 export const cropImage: CropImage = (dataUrl, rect, dpr = window.devicePixelRatio) =>
-  new Promise((resolve) => {
+  new Promise((resolve, reject) => {
     const img = new Image();
     img.src = dataUrl;
-
-    console.log(dataUrl, rect, dpr);
 
     img.onload = () => {
       const canvas = document.createElement('canvas');
@@ -27,7 +25,10 @@ export const cropImage: CropImage = (dataUrl, rect, dpr = window.devicePixelRati
         rect.height * dpr,
       );
 
-      resolve(canvas.toDataURL('image/png'));
+      canvas.toBlob((blob) => {
+        if (blob) resolve(blob);
+        reject(new Error('cropImage: failed to create a blob.'));
+      }, 'image/png');
     };
   });
 

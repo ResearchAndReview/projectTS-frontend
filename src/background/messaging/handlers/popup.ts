@@ -1,4 +1,3 @@
-import { getTasks } from '@/background/tasks/storage';
 import { MessageTo } from '@/types';
 
 // Prevent multiple registration of the port handler
@@ -23,12 +22,6 @@ export const registerPopupPortHandler = () => {
     // Define a message handler for messages received through the port
     const handler = async (msg: MessageTo<'background'>) => {
       switch (msg.type) {
-        case 'GET_ALL_TASKS':
-          port.postMessage({
-            type: 'GET_ALL_TASKS_RESPONSE',
-            payload: await getTasks(),
-          });
-          return;
         default:
           return;
       }

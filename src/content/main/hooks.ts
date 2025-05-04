@@ -2,15 +2,6 @@ import { useEffect, useState } from 'react';
 import { ExtractPayload } from '@/types';
 import { MessageHandlerMapFor, MessageTo } from '@/types/message';
 
-export const useTaskSync = (sessionId: string) => {
-  useEffect(() => {
-    chrome.runtime.sendMessage({
-      type: 'REQUEST_TASKS',
-      payload: { sessionId } as ExtractPayload<'REQUEST_TASKS'>,
-    });
-  }, [sessionId]);
-};
-
 export const useEscape = (callback: () => void, enabled: boolean = true) => {
   useEffect(() => {
     if (!enabled) return;

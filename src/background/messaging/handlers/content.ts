@@ -1,87 +1,60 @@
-import { addTask, getTasks, processTask } from '@/background/tasks';
-import { ExtractPayload, Message, Rect, Task } from '@/types';
+import { Message } from '@/types';
+
+type SendResponse = Parameters<Parameters<typeof chrome.runtime.onMessage.addListener>[0]>[2];
 
 // Handling logics
 
-const captureScreenshot = (rect: Rect) => {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const { id, windowId } = tabs[0];
-    if (!id || !windowId) return;
-
-    chrome.tabs.captureVisibleTab(windowId, { format: 'png' }, (dataUrl) => {
-      if (!dataUrl) return;
-
-      chrome.tabs.sendMessage(id, {
-        type: 'SCREENSHOT_DATA',
-        payload: { rect, dataUrl },
-      } as Message);
-    });
-  });
+const captureScreenshot = async (windowId: number, sendResponse: SendResponse) => {
+  const dataUrl = await chrome.tabs.captureVisibleTab(windowId, { format: 'png' });
+  sendResponse({ screenshot: dataUrl });
 };
 
-const submitTask = ({
-  payload: { rect, image, sessionId },
-  url,
-  tabId,
-}: {
-  payload: ExtractPayload<'SUBMIT_TASK'>;
-  url: string;
-  tabId: number;
-}) => {
-  const task: Task = {
-    id: crypto.randomUUID(),
-    context: { sessionId, url },
-    rect,
-    image,
-    status: 'pending',
-    captions: [],
-  };
-  addTask(task);
-  chrome.tabs.sendMessage(tabId, {
-    type: 'TASK_CREATED',
-    payload: task,
-  });
-  processTask(tabId, task);
+const createTask = async (image: Blob, sendResponse: SendResponse) => {
+  console.log('CREATE_TASK received', image);
+
+  sendResponse({ taskId: 'hardcoded-id-for-test' });
 };
 
-const requestTasks = async ({
-  payload: { sessionId },
-  tabId,
-}: {
-  payload: ExtractPayload<'REQUEST_TASKS'>;
-  tabId: number;
-}) => {
-  chrome.tabs.sendMessage(tabId, {
-    type: 'TASKS_SYNC',
-    payload: await getTasks(sessionId),
+const pollTask = async (taskId: string, sendResponse: SendResponse) => {
+  console.log('POLL_TASK received', taskId);
+
+  sendResponse({
+    captions: [
+      {
+        id: '1',
+        rect: { x: 16, y: 16, width: 32, height: 64 },
+        text: '筆坊は寒い日も布団に入ってはくれぬ。',
+        translation: '후데보는 추운 날에도 이불에 들어와 주지 않는다.',
+      },
+    ],
   });
 };
 
 // Content message handler (call appropriate logic for each message)
 
-export const handleContentMessages = async (
+export const handleContentMessages = (
   msg: Message,
   sender: chrome.runtime.MessageSender,
-): Promise<boolean> => {
-  const tabId = sender.tab?.id;
-  const url = sender.url;
-
-  if (tabId === undefined || !url) {
-    console.warn('[handleTaskMessages] missing tabId or url', sender);
+  sendResponse: SendResponse,
+): boolean => {
+  if (!sender.tab || !sender.tab.id || !sender.url) {
+    console.warn('[handleContentMessages] missing tabId or url', sender);
     return false;
   }
 
-  switch (msg.type) {
+  const { type, payload } = msg;
+
+  switch (type) {
     case 'CAPTURE_SCREENSHOT':
-      captureScreenshot(msg.payload.rect);
+      captureScreenshot(sender.tab.windowId, sendResponse);
       return true;
 
-    case 'SUBMIT_TASK':
-      submitTask({ payload: msg.payload, url, tabId });
+    case 'CREATE_TASK':
+      createTask(payload.image, sendResponse);
       return true;
 
-    case 'REQUEST_TASKS': {
-      await requestTasks({ payload: msg.payload, tabId });
+    case 'POLL_TASK': {
+      pollTask(payload.taskId, sendResponse);
       return true;
     }
 
