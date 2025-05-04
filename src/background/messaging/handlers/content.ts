@@ -19,6 +19,7 @@ const pollTask = async (taskId: string, sendResponse: SendResponse) => {
   console.log('POLL_TASK received', taskId);
 
   sendResponse({
+    status: 'success',
     captions: [
       {
         id: '1',
