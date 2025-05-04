@@ -7,13 +7,18 @@ export const sendRuntimeMessage = async <T extends MessageType>({
   type: T;
   payload: ExtractPayload<T>;
 }): Promise<ExtractResponse<T>> => {
-  const res = await chrome.runtime.sendMessage<
-    { type: T; payload: ExtractPayload<T> },
-    ExtractResponse<T>
-  >({
+  return chrome.runtime.sendMessage<{ type: T; payload: ExtractPayload<T> }, ExtractResponse<T>>({
     type,
     payload,
   });
+};
 
-  return res;
+export const sendTabMessage = async <T extends MessageType>(
+  tabId: number,
+  message: {
+    type: T;
+    payload: ExtractPayload<T>;
+  },
+): Promise<ExtractResponse<T>> => {
+  return chrome.tabs.sendMessage(tabId, message);
 };

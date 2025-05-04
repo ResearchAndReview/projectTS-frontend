@@ -1,5 +1,5 @@
 import { Rect } from '../geometry';
-import { TaskPollResponse } from '../task';
+import { Task, TaskPollResponse } from '../task';
 
 export interface MessageMap {
   ENTER_DRAG_MODE: {
@@ -21,5 +21,10 @@ export interface MessageMap {
     payload: { taskId: string };
     response: TaskPollResponse;
     meta: { from: 'content'; to: 'background' };
+  };
+  REQUEST_TASKS: {
+    payload: undefined;
+    response: { tasks: Task[] };
+    meta: { from: 'popup'; to: 'content' };
   };
 }

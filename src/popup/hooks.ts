@@ -1,40 +1,45 @@
-import { useEffect, useRef, useState } from 'react';
-import { MessageTo } from '@/types';
-import { Task } from '@/types/task';
+import { useEffect, useState } from 'react';
+import { Task } from '@/types';
+import { sendTabMessage } from '@/utils/message';
 
-export const useTasks = () => {
-  const [tasks /*, setTasks*/] = useState<Task[]>([]);
-  const portRef = useRef<chrome.runtime.Port | null>(null);
+export const useTasksFromAllTabs = () => {
+  const [tasks, setTasks] = useState<Task[]>([]);
 
+  /**
+   * Fetches tasks from all active tabs by sending a REQUEST_TASKS message
+   * to each tab that has a content script loaded.
+   */
+  const fetchTasks = async () => {
+    const tabs = await chrome.tabs.query({});
+    const allTasks: Task[] = [];
+
+    await Promise.all(
+      tabs.map(async (tab) => {
+        if (!tab.id) return;
+
+        try {
+          const res = await sendTabMessage(tab.id, {
+            type: 'REQUEST_TASKS',
+            payload: undefined,
+          });
+
+          allTasks.push(...res.tasks);
+        } catch {
+          // ignore
+        }
+      }),
+    );
+
+    setTasks(allTasks);
+  };
+
+  /** Fetch tasks immediately when the hook is mounted. */
   useEffect(() => {
-    if (!portRef.current) portRef.current = chrome.runtime.connect({ name: 'popup' });
-
-    const port = portRef.current;
-
-    const handleMessage = (msg: MessageTo<'popup'> | { type: 'READY' }) => {
-      console.log('popup', msg);
-
-      switch (msg.type) {
-        case 'READY':
-          port.postMessage({ type: 'GET_ALL_TASKS' });
-          return;
-        // case 'GET_ALL_TASKS_RESPONSE':
-        //   setTasks(msg.payload.reverse());
-        //   return;
-        default:
-          console.warn(`invalid message: ${msg}`);
-          return;
-      }
-    };
-
-    port.onMessage.addListener(handleMessage);
-
-    return () => {
-      port.onMessage.removeListener(handleMessage);
-      port.disconnect();
-      portRef.current = null;
-    };
+    fetchTasks();
   }, []);
 
-  return { tasks };
+  return {
+    tasks,
+    refetch: fetchTasks,
+  };
 };
