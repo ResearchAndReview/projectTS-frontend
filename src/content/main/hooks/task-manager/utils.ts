@@ -29,12 +29,15 @@ export const pollTask = async (taskId: string): Promise<TaskPollResponse> => {
  * Requests a screenshot and crops it to the specified rect.
  */
 export const requestScreenshot = async (rect: Rect) => {
-  const { screenshot } = await sendRuntimeMessage({
+  const { screenshot, zoom } = await sendRuntimeMessage({
     type: 'CAPTURE_SCREENSHOT',
     payload: { rect },
   });
 
-  return await cropImage(screenshot, rect);
+  const cropped = await cropImage(screenshot, rect);
+  const resized = await resizeImage(cropped, zoom);
+
+  return resized;
 };
 
 /**
@@ -78,6 +81,43 @@ const cropImage = (
       } catch {
         reject(new Error('cropImage: failed to create a data URL.'));
       }
+    };
+  });
+
+/**
+ * Resizes the given DataURL image by the specified zoom percentage.
+ *
+ * @param image DataURL string of the image to resize.
+ * @param zoomPercent The zoom percentage (e.g., 80 for 80% zoom).
+ * @returns A new DataURL string of the resized image.
+ */
+export const resizeImage = (image: Task['image'], zoomPercent: number): Promise<Task['image']> =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = image;
+
+    img.onload = () => {
+      const scale = 100 / zoomPercent;
+      const newWidth = img.width * scale;
+      const newHeight = img.height * scale;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = newWidth;
+      canvas.height = newHeight;
+
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+      try {
+        const resizedDataUrl = canvas.toDataURL('image/png');
+        resolve(resizedDataUrl);
+      } catch {
+        reject(new Error('resizeImage: failed to create a data URL.'));
+      }
+    };
+
+    img.onerror = () => {
+      reject(new Error('resizeImage: failed to load image.'));
     };
   });
 

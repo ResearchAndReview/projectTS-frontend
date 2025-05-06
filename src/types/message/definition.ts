@@ -9,7 +9,7 @@ export interface MessageMap {
   };
   CAPTURE_SCREENSHOT: {
     payload: { rect: Rect };
-    response: { screenshot: string };
+    response: { screenshot: string; zoom: number };
     meta: { from: 'content'; to: 'background' };
   };
   CREATE_TASK: {

@@ -5,9 +5,15 @@ type SendResponse = Parameters<Parameters<typeof chrome.runtime.onMessage.addLis
 
 // Handling logics
 
-const captureScreenshot = async (windowId: number, sendResponse: SendResponse) => {
+const captureScreenshot = async (windowId: number, tabId: number, sendResponse: SendResponse) => {
   const dataUrl = await chrome.tabs.captureVisibleTab(windowId, { format: 'png' });
-  sendResponse({ screenshot: dataUrl });
+  const zoom = await new Promise<number>((resolve) => {
+    chrome.tabs.getZoom(tabId, (zoom) => {
+      resolve(zoom * 100);
+    });
+  });
+
+  sendResponse({ screenshot: dataUrl, zoom });
 };
 
 const createTask = async (image: Task['image'], sendResponse: SendResponse) => {
@@ -104,7 +110,7 @@ export const handleContentMessages = (
 
   switch (type) {
     case 'CAPTURE_SCREENSHOT':
-      captureScreenshot(sender.tab.windowId, sendResponse);
+      captureScreenshot(sender.tab.windowId, sender.tab.id, sendResponse);
       return true;
 
     case 'CREATE_TASK':

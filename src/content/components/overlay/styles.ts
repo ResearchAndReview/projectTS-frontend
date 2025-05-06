@@ -2,7 +2,8 @@ import styled from '@emotion/styled';
 
 export const OverlayRoot = styled.div`
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
   pointer-events: none;
   z-index: 2147483646;
 `;
