@@ -18,7 +18,7 @@ const captureScreenshot = async (windowId: number, tabId: number, sendResponse: 
 };
 
 const createTask = async (image: Task['image'], sendResponse: SendResponse) => {
-  if (ENVIRONMENT === 'development') {
+  if (ENVIRONMENT === 'dev') {
     sendResponse({ taskId: 'environment-development' });
     return;
   }
@@ -63,7 +63,7 @@ type TempTaskPollResponse = {
 };
 
 const pollTask = async (taskId: string, sendResponse: SendResponse) => {
-  if (ENVIRONMENT === 'development') {
+  if (ENVIRONMENT === 'dev') {
     sendResponse({
       status: 'success',
       captions: [

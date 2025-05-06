@@ -1,4 +1,5 @@
 import ky from 'ky';
+import { API_URL } from '@/lib/utils';
 
 let nodeId: string | undefined = undefined;
 
@@ -18,7 +19,7 @@ export const getNodeId = async (): Promise<string | undefined> => {
   }
 
   try {
-    const instance = ky.create({ prefixUrl: 'https://js.thxx.xyz' });
+    const instance = ky.create({ prefixUrl: API_URL });
     const { uuid } = await instance.post<{ uuid: string }>('node/register').json();
     await chrome.storage.local.set({ nodeId: uuid });
     nodeId = uuid;
