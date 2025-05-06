@@ -1,5 +1,5 @@
+import { sendRuntimeMessage } from '@/lib/utils';
 import { Rect, Task, TaskPollResponse } from '@/types';
-import { sendRuntimeMessage } from '@/utils';
 
 /**
  * Submits the cropped image and returns the created task ID.

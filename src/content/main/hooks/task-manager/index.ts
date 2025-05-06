@@ -84,6 +84,8 @@ const useTaskPolling = (
       if (pollingRefs.current[taskId]) return;
 
       const interval = setInterval(async () => {
+        if (!taskId) return;
+
         const { status, captions } = await pollTask(taskId);
 
         if (status === 'pending') {

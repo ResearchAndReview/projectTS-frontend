@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
+import { sendTabMessage } from '@/lib/utils';
 import { Task } from '@/types';
-import { sendTabMessage } from '@/utils';
 
 export const useTasksFromAllTabs = () => {
   const [tasks, setTasks] = useState<Task[]>([]);

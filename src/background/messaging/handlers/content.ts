@@ -1,4 +1,5 @@
-import { Message, Task } from '@/types';
+import { api } from '@/lib/api';
+import { Message, Task, TaskPollResponse } from '@/types';
 
 type SendResponse = Parameters<Parameters<typeof chrome.runtime.onMessage.addListener>[0]>[2];
 
@@ -9,22 +10,82 @@ const captureScreenshot = async (windowId: number, sendResponse: SendResponse) =
   sendResponse({ screenshot: dataUrl });
 };
 
-const createTask = async (_image: Task['image'], sendResponse: SendResponse) => {
-  sendResponse({ taskId: 'hardcoded-id-for-test' });
+const createTask = async (image: Task['image'], sendResponse: SendResponse) => {
+  try {
+    // Convert DataURL to Blob
+    const blob = await (await fetch(image)).blob();
+
+    // Build the multipart form data
+    const formData = new FormData();
+    formData.append('request', JSON.stringify({ translateFrom: 'ja-JP', translateTo: 'ko-KR' }));
+    formData.append('file', blob);
+
+    // Make the API request
+    const { createdTaskId } = await api<{ createdTaskId: string }>({
+      method: 'post',
+      url: 'task/create',
+      options: {
+        body: formData,
+      },
+      body: 'json',
+    });
+
+    sendResponse({ taskId: createdTaskId });
+  } catch (err) {
+    console.error('[createTask] Failed to create task:', err);
+    sendResponse({ taskId: null });
+  }
 };
 
-const pollTask = async (_taskId: string, sendResponse: SendResponse) => {
-  sendResponse({
-    status: 'success',
-    captions: [
-      {
-        id: '1',
-        rect: { x: 16, y: 16, width: 32, height: 64 },
-        text: '筆坊は寒い日も布団に入ってはくれぬ。',
-        translation: '후데보는 추운 날에도 이불에 들어와 주지 않는다.',
+type TempTaskPollResponse = {
+  status: 'success' | 'pending' | 'failed';
+  taskResults: {
+    ocrResultId: number;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    originalText: string;
+    translatedText: string;
+  }[];
+};
+
+const pollTask = async (taskId: string, sendResponse: SendResponse) => {
+  try {
+    const result = await api<TempTaskPollResponse>({
+      method: 'get',
+      url: 'task/status',
+      options: {
+        searchParams: { taskId },
       },
-    ],
-  });
+    });
+
+    if (result.status === 'success') {
+      const newResult: TaskPollResponse = {
+        status: 'success',
+        captions: result.taskResults.map((i) => ({
+          id: crypto.randomUUID(),
+          rect: { x: i.x, y: i.y, width: i.width, height: i.height },
+          text: i.originalText,
+          translation: i.translatedText,
+        })),
+        reason: undefined,
+      };
+
+      sendResponse(newResult);
+    }
+
+    if (result.status === 'pending') {
+      sendResponse({ status: 'pending', reason: undefined, captions: undefined });
+    }
+
+    if (result.status === 'failed') {
+      sendResponse({ status: 'error', reason: '', captions: undefined });
+    }
+  } catch (err) {
+    console.error('[pollTask] Failed to poll task:', err);
+    sendResponse({ status: 'error', reason: 'Failed to fetch task status' });
+  }
 };
 
 // Content message handler (call appropriate logic for each message)
