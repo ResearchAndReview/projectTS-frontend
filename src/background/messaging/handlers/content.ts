@@ -1,5 +1,6 @@
 import { api } from '@/lib/api';
-import { Message, Task, TaskPollResponse } from '@/types';
+import { ENVIRONMENT } from '@/lib/utils';
+import { Message, Task } from '@/types';
 
 type SendResponse = Parameters<Parameters<typeof chrome.runtime.onMessage.addListener>[0]>[2];
 
@@ -17,6 +18,11 @@ const captureScreenshot = async (windowId: number, tabId: number, sendResponse: 
 };
 
 const createTask = async (image: Task['image'], sendResponse: SendResponse) => {
+  if (ENVIRONMENT === 'development') {
+    sendResponse({ taskId: 'environment-development' });
+    return;
+  }
+
   try {
     // Convert DataURL to Blob
     const blob = await (await fetch(image)).blob();
@@ -57,6 +63,23 @@ type TempTaskPollResponse = {
 };
 
 const pollTask = async (taskId: string, sendResponse: SendResponse) => {
+  if (ENVIRONMENT === 'development') {
+    sendResponse({
+      status: 'success',
+      captions: [
+        {
+          id: crypto.randomUUID(),
+          rect: { x: 32, y: 32, width: 64, height: 64 },
+          text: 'test',
+          translation: '테스트',
+        },
+      ],
+      reason: undefined,
+    });
+
+    return;
+  }
+
   try {
     const result = await api<TempTaskPollResponse>({
       method: 'get',
@@ -66,31 +89,30 @@ const pollTask = async (taskId: string, sendResponse: SendResponse) => {
       },
     });
 
-    if (result.status === 'success') {
-      const newResult: TaskPollResponse = {
-        status: 'success',
-        captions: result.taskResults.map((i) => ({
-          id: crypto.randomUUID(),
-          rect: { x: i.x, y: i.y, width: i.width, height: i.height },
-          text: i.originalText,
-          translation: i.translatedText,
-        })),
-        reason: undefined,
-      };
-
-      sendResponse(newResult);
-    }
-
-    if (result.status === 'pending') {
-      sendResponse({ status: 'pending', reason: undefined, captions: undefined });
-    }
-
-    if (result.status === 'failed') {
-      sendResponse({ status: 'error', reason: '', captions: undefined });
+    switch (result.status) {
+      case 'pending':
+        sendResponse({ status: 'pending', reason: undefined, captions: undefined });
+        return;
+      case 'failed':
+        sendResponse({ status: 'error', reason: 'Failed to fetch task status' });
+        return;
+      case 'success':
+        sendResponse({
+          status: 'success',
+          captions: result.taskResults.map((i) => ({
+            id: crypto.randomUUID(),
+            rect: { x: i.x, y: i.y, width: i.width, height: i.height },
+            text: i.originalText,
+            translation: i.translatedText,
+          })),
+          reason: undefined,
+        });
+        return;
+      default:
+        throw new Error(`unknown status ${result.status}`);
     }
   } catch (err) {
     console.error('[pollTask] Failed to poll task:', err);
-    sendResponse({ status: 'error', reason: 'Failed to fetch task status' });
   }
 };
 

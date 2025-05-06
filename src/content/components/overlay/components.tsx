@@ -19,7 +19,7 @@ interface NoteProps {
 // Components
 
 export const Frame = ({ rect, children }: FrameProps) => {
-  const top = rect.y + scrollY;
+  const top = rect.y;
   const left = rect.x;
 
   return (

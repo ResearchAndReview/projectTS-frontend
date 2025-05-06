@@ -23,7 +23,7 @@ export const useRect = (onComplete: (rect: Rect) => void) => {
     };
 
     const onMouseUp = () => {
-      if (rect) onComplete(rect);
+      if (rect) onComplete({ ...rect, y: rect.y + window.scrollY });
       setStart(null);
       setCurrent(null);
     };
