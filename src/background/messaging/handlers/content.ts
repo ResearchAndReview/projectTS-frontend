@@ -69,7 +69,13 @@ const pollTask = async (taskId: string, sendResponse: SendResponse) => {
       captions: [
         {
           id: crypto.randomUUID(),
-          rect: { x: 32, y: 32, width: 64, height: 64 },
+          rect: { x: 32, y: 32, width: 32, height: 32 },
+          text: 'test',
+          translation: '테스트',
+        },
+        {
+          id: crypto.randomUUID(),
+          rect: { x: 32, y: 64, width: 32, height: 32 },
           text: 'test',
           translation: '테스트',
         },
