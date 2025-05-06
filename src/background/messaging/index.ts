@@ -1,19 +1,21 @@
 import { Message } from '@/types';
-import { handleContentMessages, registerPopupPortHandler } from './handlers';
+import { handleContentMessages } from './handlers';
 
 // Event handling functions
 
 type OnContextMenuClicked = (info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) => void;
 type OnRuntimeMessage = Parameters<typeof chrome.runtime.onMessage.addListener>[0];
 
-const onRuntimeMessage: OnRuntimeMessage = async (msg: Message, sender) => {
-  if (await handleContentMessages(msg, sender)) return;
-  console.warn('Unhandled message:', msg);
+const onRuntimeMessage: OnRuntimeMessage = (msg: Message, sender, sendResponse) => {
+  if (handleContentMessages(msg, sender, sendResponse)) return true;
+  console.warn(`unhandled message ${msg}`);
+
+  return true;
 };
 
 const onContextMenuClicked: OnContextMenuClicked = (info, tab) => {
   if (info.menuItemId === 'enter-drag-mode' && tab?.id !== undefined) {
-    chrome.tabs.sendMessage(tab.id, { type: 'ENTER_DRAG_MODE' } as Message);
+    chrome.tabs.sendMessage(tab.id, { type: 'ENTER_DRAG_MODE' });
   }
 };
 
@@ -25,6 +27,4 @@ export const registerMessageListeners = () => {
 
   chrome.contextMenus.onClicked.removeListener(onContextMenuClicked);
   chrome.contextMenus.onClicked.addListener(onContextMenuClicked);
-
-  registerPopupPortHandler();
 };

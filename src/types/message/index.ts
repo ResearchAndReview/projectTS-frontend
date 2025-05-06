@@ -56,6 +56,9 @@ export type ExtractPayload<T extends MessageType> = MessageMap[T]['payload'];
 /** Extracts the meta info (from/to) of a specific message type. */
 export type ExtractMeta<T extends MessageType> = MessageMap[T]['meta'];
 
+/** Extracts the meta info (from/to) of a specific message type. */
+export type ExtractResponse<T extends MessageType> = MessageMap[T]['response'];
+
 /** Defines the handler function type for a specific message type. */
 export type MessageHandler<T extends MessageType> =
   ExtractPayload<T> extends undefined ? () => void : (payload: ExtractPayload<T>) => void;

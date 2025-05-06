@@ -11,9 +11,13 @@ export interface Caption {
 
 export interface Task {
   id: string;
-  context: { sessionId: string; url: string };
   status: TaskStatus;
   image: string;
   rect: Rect;
   captions: Caption[];
 }
+
+export type TaskPollResponse =
+  | { status: 'pending'; captions: undefined; reason: undefined }
+  | { status: 'success'; captions: Caption[]; reason: undefined }
+  | { status: 'error'; captions: undefined; reason: string };

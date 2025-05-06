@@ -1,12 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Point, Rect } from '@/types';
-import styled from '@emotion/styled';
 
-interface Props {
-  onComplete: (rect: Rect) => void;
-}
-
-export const DragController = ({ onComplete }: Props) => {
+export const useRect = (onComplete: (rect: Rect) => void) => {
   const [start, setStart] = useState<Point | null>(null);
   const [current, setCurrent] = useState<Point | null>(null);
 
@@ -44,7 +39,7 @@ export const DragController = ({ onComplete }: Props) => {
     };
   }, [start, rect, onComplete]);
 
-  return <Overlay>{rect && <Box rect={rect} />}</Overlay>;
+  return { rect };
 };
 
 // Utility functions
@@ -60,28 +55,3 @@ const calcRect = (start: Point | null, current: Point | null): Rect | null => {
 
   return { x, y, width, height };
 };
-
-// Styled components
-
-const Overlay = styled.div`
-  position: fixed;
-  inset: 0;
-  z-index: 999999;
-  cursor: crosshair;
-  user-select: none;
-  background-color: transparent;
-`;
-
-const Box = styled.div<{ rect: Rect }>`
-  position: absolute;
-  top: ${({ rect: { y } }) => y}px;
-  left: ${({ rect: { x } }) => x}px;
-  width: ${({ rect: { width } }) => width}px;
-  height: ${({ rect: { height } }) => height}px;
-
-  border: 1px dashed #7300ff;
-  background-color: rgba(66, 165, 245, 0.15);
-
-  pointer-events: none;
-  z-index: 1000000;
-`;

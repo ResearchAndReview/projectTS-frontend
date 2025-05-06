@@ -1,45 +1,30 @@
 import { Rect } from '../geometry';
-import { Task } from '../task';
+import { Task, TaskPollResponse } from '../task';
 
 export interface MessageMap {
   ENTER_DRAG_MODE: {
     payload: undefined;
+    response: undefined;
     meta: { from: 'background'; to: 'content' };
   };
   CAPTURE_SCREENSHOT: {
     payload: { rect: Rect };
+    response: { screenshot: string };
     meta: { from: 'content'; to: 'background' };
   };
-  SCREENSHOT_DATA: {
-    payload: { rect: Rect; dataUrl: string };
-    meta: { from: 'background'; to: 'content' };
-  };
-  SUBMIT_TASK: {
-    payload: { rect: Rect; image: string; sessionId: string };
+  CREATE_TASK: {
+    payload: { image: Task['image'] };
+    response: { taskId: string };
     meta: { from: 'content'; to: 'background' };
   };
-  TASK_CREATED: {
-    payload: Task;
-    meta: { from: 'background'; to: 'content' };
-  };
-  TASK_UPDATED: {
-    payload: Task;
-    meta: { from: 'background'; to: 'content' };
+  POLL_TASK: {
+    payload: { taskId: string };
+    response: TaskPollResponse;
+    meta: { from: 'content'; to: 'background' };
   };
   REQUEST_TASKS: {
-    payload: { sessionId: string };
-    meta: { from: 'content'; to: 'background' };
-  };
-  TASKS_SYNC: {
-    payload: Task[];
-    meta: { from: 'background'; to: 'content' };
-  };
-  GET_ALL_TASKS: {
     payload: undefined;
-    meta: { from: 'popup'; to: 'background' };
-  };
-  GET_ALL_TASKS_RESPONSE: {
-    payload: Task[];
-    meta: { from: 'background'; to: 'popup' };
+    response: { tasks: Task[] };
+    meta: { from: 'popup'; to: 'content' };
   };
 }
