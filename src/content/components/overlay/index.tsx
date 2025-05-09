@@ -9,11 +9,10 @@ interface Props {
 export const TranslationOverlay = ({ tasks }: Props) => (
   <OverlayRoot>
     {tasks.map((task) => (
-      <Frame key={task.id} rect={task.rect}>
-        {task.status === 'success' &&
-          task.captions.map((caption) => (
-            <Note key={caption.id} rect={caption.rect} translation={caption.translation} />
-          ))}
+      <Frame key={`task#${task.id}`} rect={task.rect}>
+        {task.captions.map((caption) => (
+          <Note key={`note#${caption.id}`} rect={caption.rect} translation={caption.translation} />
+        ))}
       </Frame>
     ))}
   </OverlayRoot>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import { Rect } from '@/types';
+import { Task } from '@/types';
 import { Frame as FrameComponent } from './styles';
 import {
   NoteBody as NoteBodyComponent,
@@ -11,18 +11,16 @@ import {
 // Component Props
 
 interface FrameProps {
-  rect: Rect;
+  rect: Task['rect'];
   children: React.ReactNode;
 }
 
 interface NoteProps {
-  rect: Rect;
-  translation: string;
+  rect: Task['rect'];
+  translation: Task['captions'][number]['translation'];
 }
 
-interface NoteBodyProps {
-  rect: Rect;
-  translation: string;
+interface NoteBodyProps extends NoteProps {
   hover: boolean;
 }
 
@@ -51,7 +49,7 @@ export const Note = ({ rect, translation }: NoteProps) => {
       onMouseLeave={() => setHover(false)}
     >
       <NoteFloatComponent hover={hover} />
-      <NoteBody rect={rect} translation={translation} hover={hover} />
+      {translation && <NoteBody rect={rect} translation={translation} hover={hover} />}
     </NoteComponent>
   );
 };

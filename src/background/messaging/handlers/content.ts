@@ -96,22 +96,31 @@ const pollTask = async (taskId: string, sendResponse: SendResponse) => {
     });
 
     switch (result.status) {
-      case 'pending':
-        sendResponse({ status: 'pending', reason: undefined, captions: undefined });
-        return;
       case 'failed':
         sendResponse({ status: 'error', reason: 'Failed to fetch task status' });
         return;
-      case 'success':
+      case 'pending':
         sendResponse({
-          status: 'success',
+          status: 'pending',
+          reason: undefined,
           captions: result.taskResults.map((i) => ({
             id: crypto.randomUUID(),
             rect: { x: i.x, y: i.y, width: i.width, height: i.height },
             text: i.originalText,
             translation: i.translatedText,
           })),
+        });
+        return;
+      case 'success':
+        sendResponse({
+          status: 'success',
           reason: undefined,
+          captions: result.taskResults.map((i) => ({
+            id: crypto.randomUUID(),
+            rect: { x: i.x, y: i.y, width: i.width, height: i.height },
+            text: i.originalText,
+            translation: i.translatedText,
+          })),
         });
         return;
       default:

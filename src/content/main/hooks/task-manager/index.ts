@@ -60,7 +60,7 @@ const useMessageHandler = (tasks: Task[]) => {
 
 const useTaskPolling = (
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>,
-  time: number = 2000,
+  time: number = 1000,
 ) => {
   const pollingRefs = useRef<Record<string, NodeJS.Timeout>>({});
 
@@ -88,17 +88,18 @@ const useTaskPolling = (
 
         const { status, captions } = await pollTask(taskId);
 
-        if (status === 'pending') {
+        if (status === 'error') {
+          // TODO: Add error handling logic
+
+          stopPolling(taskId);
           return;
         }
 
-        setTasks((prev) =>
-          prev.map((t) =>
-            t.id === taskId ? { ...t, status, ...(status === 'success' ? { captions } : {}) } : t,
-          ),
-        );
+        setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, status, captions } : t)));
 
-        stopPolling(taskId);
+        if (status === 'success') {
+          stopPolling(taskId);
+        }
       }, time);
 
       pollingRefs.current[taskId] = interval;

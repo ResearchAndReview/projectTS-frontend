@@ -6,7 +6,7 @@ export interface Caption {
   id: string;
   rect: Rect;
   text: string;
-  translation: string;
+  translation: string | null;
 }
 
 export interface Task {
@@ -18,6 +18,6 @@ export interface Task {
 }
 
 export type TaskPollResponse =
-  | { status: 'pending'; captions: undefined; reason: undefined }
+  | { status: 'pending'; captions: Caption[]; reason: undefined }
   | { status: 'success'; captions: Caption[]; reason: undefined }
   | { status: 'error'; captions: undefined; reason: string };
