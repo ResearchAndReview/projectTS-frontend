@@ -66,7 +66,7 @@ const cropImage = (
       ctx.drawImage(
         img,
         rect.x * dpr,
-        rect.y * dpr,
+        (rect.y - window.scrollY) * dpr,
         rect.width * dpr,
         rect.height * dpr,
         0,
