@@ -13,6 +13,7 @@ import {
 interface FrameProps {
   rect: Task['rect'];
   children: React.ReactNode;
+  loading: boolean;
 }
 
 interface NoteProps {
@@ -26,12 +27,12 @@ interface NoteBodyProps extends NoteProps {
 
 // Components
 
-export const Frame = ({ rect, children }: FrameProps) => {
+export const Frame = ({ rect, children, loading }: FrameProps) => {
   const top = rect.y;
   const left = rect.x;
 
   return (
-    <FrameComponent style={{ top, left, width: rect.width, height: rect.height }}>
+    <FrameComponent style={{ top, left, width: rect.width, height: rect.height }} loading={loading}>
       {children}
     </FrameComponent>
   );
@@ -48,7 +49,7 @@ export const Note = ({ rect, translation }: NoteProps) => {
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      <NoteFloatComponent hover={hover} />
+      <NoteFloatComponent hover={hover} loading={!translation} />
       {translation && <NoteBody rect={rect} translation={translation} hover={hover} />}
     </NoteComponent>
   );

@@ -17,7 +17,7 @@ export const Box = styled.div<{ rect: Rect }>`
   width: ${({ rect: { width } }) => width}px;
   height: ${({ rect: { height } }) => height}px;
 
-  border: 1px dashed #7300ff;
+  border: 1px solid #7300ff;
   background-color: rgba(66, 165, 245, 0.15);
 
   pointer-events: none;

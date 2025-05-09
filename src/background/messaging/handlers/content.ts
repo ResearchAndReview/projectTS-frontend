@@ -68,16 +68,16 @@ const pollTask = async (taskId: string, sendResponse: SendResponse) => {
       status: 'success',
       captions: [
         {
-          id: crypto.randomUUID(),
+          id: 'random-id-1',
           rect: { x: 32, y: 32, width: 32, height: 32 },
-          text: 'test',
-          translation: '테스트',
+          text: 'test 1',
+          translation: '테스트 1',
         },
         {
-          id: crypto.randomUUID(),
+          id: 'random-id-2',
           rect: { x: 32, y: 64, width: 32, height: 32 },
-          text: 'test',
-          translation: '테스트',
+          text: 'test 2',
+          translation: '테스트 2',
         },
       ],
       reason: undefined,
