@@ -3,9 +3,10 @@ import { Content } from './components/content';
 import { Footer } from './components/footer';
 import { Header } from './components/header';
 import { useTasksFromAllTabs } from './hooks';
+import { Filter } from './types';
 
 export default function App() {
-  const [filter, setFilter] = useState<string>('all');
+  const [filter, setFilter] = useState<Filter>('all');
   const { tasks } = useTasksFromAllTabs();
 
   return (

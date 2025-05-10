@@ -30,7 +30,7 @@ export const useTasksFromAllTabs = () => {
       }),
     );
 
-    setTasks(allTasks);
+    setTasks(allTasks.reverse());
   };
 
   /** Fetch tasks immediately when the hook is mounted. */
