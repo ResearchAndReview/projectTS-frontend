@@ -5,12 +5,14 @@ import { Rect, Task, TaskPollResponse } from '@/types';
  * Submits the cropped image and returns the created task ID.
  */
 export const createTask = async (image: Task['image']) => {
-  const { taskId } = await sendRuntimeMessage({
+  const response = await sendRuntimeMessage({
     type: 'CREATE_TASK',
     payload: { image },
   });
 
-  return taskId;
+  if (response.success) return response.data.taskId;
+
+  throw response.error;
 };
 
 /**
@@ -22,22 +24,26 @@ export const pollTask = async (taskId: string): Promise<TaskPollResponse> => {
     payload: { taskId },
   });
 
-  return response;
+  if (response.success) return response.data;
+
+  throw response.error;
 };
 
 /**
  * Requests a screenshot and crops it to the specified rect.
  */
 export const requestScreenshot = async (rect: Rect) => {
-  const { screenshot, zoom } = await sendRuntimeMessage({
+  const response = await sendRuntimeMessage({
     type: 'CAPTURE_SCREENSHOT',
     payload: { rect },
   });
 
-  // const cropped = await cropImage(screenshot, rect);
-  // const resized = await resizeImage(cropped, zoom);
+  if (response.success) {
+    const { screenshot, zoom } = response.data;
+    return await cropAndResizeImage(screenshot, rect, zoom);
+  }
 
-  return await cropAndResizeImage(screenshot, rect, zoom);
+  throw response.error;
 };
 
 /**

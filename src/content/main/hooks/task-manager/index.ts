@@ -14,19 +14,25 @@ export const useTaskManager = () => {
   const requestTask = useCallback(
     async (rect: Rect) => {
       afterPaint(async () => {
-        const image = await requestScreenshot(rect);
-        const taskId = await createTask(image);
+        try {
+          const image = await requestScreenshot(rect);
+          const taskId = await createTask(image);
 
-        const newTask: Task = {
-          id: taskId,
-          image,
-          rect,
-          status: 'pending',
-          captions: [],
-        };
+          const newTask: Task = {
+            id: taskId,
+            image,
+            rect,
+            status: 'pending',
+            captions: [],
+          };
 
-        setTasks((prev) => [...prev, newTask]);
-        startPolling(taskId);
+          setTasks((prev) => [...prev, newTask]);
+          startPolling(taskId);
+        } catch (error) {
+          console.error('requestTask caughted an error.', error);
+
+          // TODO: handle image, taskId error here
+        }
       });
     },
     [startPolling],

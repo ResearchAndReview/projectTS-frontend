@@ -7,19 +7,24 @@ type SendResponse = Parameters<Parameters<typeof chrome.runtime.onMessage.addLis
 // Handling logics
 
 const captureScreenshot = async (windowId: number, tabId: number, sendResponse: SendResponse) => {
-  const dataUrl = await chrome.tabs.captureVisibleTab(windowId, { format: 'png' });
-  const zoom = await new Promise<number>((resolve) => {
-    chrome.tabs.getZoom(tabId, (zoom) => {
-      resolve(zoom * 100);
+  try {
+    const dataUrl = await chrome.tabs.captureVisibleTab(windowId, { format: 'png' });
+    const zoom = await new Promise<number>((resolve) => {
+      chrome.tabs.getZoom(tabId, (zoom) => {
+        resolve(zoom * 100);
+      });
     });
-  });
 
-  sendResponse({ screenshot: dataUrl, zoom });
+    sendResponse({ success: true, data: { screenshot: dataUrl, zoom } });
+  } catch (error) {
+    console.error('[captureScreenshot] error:', error);
+    sendResponse({ success: false, error: String(error) });
+  }
 };
 
 const createTask = async (image: Task['image'], sendResponse: SendResponse) => {
   if (ENVIRONMENT === 'dev') {
-    sendResponse({ taskId: 'environment-development' });
+    sendResponse({ success: true, data: { taskId: 'environment-development' } });
     return;
   }
 
@@ -42,10 +47,10 @@ const createTask = async (image: Task['image'], sendResponse: SendResponse) => {
       body: 'json',
     });
 
-    sendResponse({ taskId: createdTaskId });
-  } catch (err) {
-    console.error('[createTask] Failed to create task:', err);
-    sendResponse({ taskId: null });
+    sendResponse({ success: true, data: { taskId: createdTaskId } });
+  } catch (error) {
+    console.error('[createTask] error:', error);
+    sendResponse({ success: false, error: String(error) });
   }
 };
 
@@ -65,22 +70,25 @@ type TempTaskPollResponse = {
 const pollTask = async (taskId: string, sendResponse: SendResponse) => {
   if (ENVIRONMENT === 'dev') {
     sendResponse({
-      status: 'success',
-      captions: [
-        {
-          id: 'random-id-1',
-          rect: { x: 32, y: 32, width: 32, height: 32 },
-          text: 'test 1',
-          translation: '테스트 1',
-        },
-        {
-          id: 'random-id-2',
-          rect: { x: 32, y: 64, width: 32, height: 32 },
-          text: 'test 2',
-          translation: '테스트 2',
-        },
-      ],
-      reason: undefined,
+      success: true,
+      data: {
+        status: 'success',
+        captions: [
+          {
+            id: 'random-id-1',
+            rect: { x: 32, y: 32, width: 32, height: 32 },
+            text: 'test 1',
+            translation: '테스트 1',
+          },
+          {
+            id: 'random-id-2',
+            rect: { x: 32, y: 64, width: 32, height: 32 },
+            text: 'test 2',
+            translation: '테스트 2',
+          },
+        ],
+        reason: undefined,
+      },
     });
 
     return;
@@ -97,37 +105,48 @@ const pollTask = async (taskId: string, sendResponse: SendResponse) => {
 
     switch (result.status) {
       case 'failed':
-        sendResponse({ status: 'error', reason: 'Failed to fetch task status' });
+        sendResponse({
+          success: true,
+          data: { status: 'error', reason: 'Failed to fetch task status' },
+        });
         return;
       case 'pending':
         sendResponse({
-          status: 'pending',
-          reason: undefined,
-          captions: result.taskResults.map((i) => ({
-            id: crypto.randomUUID(),
-            rect: { x: i.x, y: i.y, width: i.width, height: i.height },
-            text: i.originalText,
-            translation: i.translatedText,
-          })),
+          success: true,
+          data: {
+            status: 'pending',
+            reason: undefined,
+            captions: result.taskResults.map((i) => ({
+              id: crypto.randomUUID(),
+              rect: { x: i.x, y: i.y, width: i.width, height: i.height },
+              text: i.originalText,
+              translation: i.translatedText,
+            })),
+          },
         });
         return;
       case 'success':
         sendResponse({
-          status: 'success',
-          reason: undefined,
-          captions: result.taskResults.map((i) => ({
-            id: crypto.randomUUID(),
-            rect: { x: i.x, y: i.y, width: i.width, height: i.height },
-            text: i.originalText,
-            translation: i.translatedText,
-          })),
+          success: true,
+          data: {
+            status: 'success',
+            reason: undefined,
+            captions: result.taskResults.map((i) => ({
+              id: crypto.randomUUID(),
+              rect: { x: i.x, y: i.y, width: i.width, height: i.height },
+              text: i.originalText,
+              translation: i.translatedText,
+            })),
+          },
         });
         return;
       default:
+        // never
         throw new Error(`unknown status ${result.status}`);
     }
-  } catch (err) {
-    console.error('[pollTask] Failed to poll task:', err);
+  } catch (error) {
+    console.error('[pollTask] error', error);
+    sendResponse({ success: false, error: String(error) });
   }
 };
 
