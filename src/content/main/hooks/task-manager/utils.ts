@@ -34,23 +34,25 @@ export const requestScreenshot = async (rect: Rect) => {
     payload: { rect },
   });
 
-  const cropped = await cropImage(screenshot, rect);
-  const resized = await resizeImage(cropped, zoom);
+  // const cropped = await cropImage(screenshot, rect);
+  // const resized = await resizeImage(cropped, zoom);
 
-  return resized;
+  return await cropAndResizeImage(screenshot, rect, zoom);
 };
 
 /**
- * Crops a rectangular area from the given data URL image.
+ * Crops and resizes a rectangular region from the given image in one step.
  *
  * @param dataUrl - The source image as a data URL (e.g., from a screenshot).
  * @param rect - The rectangular region to crop { x, y, width, height }.
- * @param dpr - (Optional) Device pixel ratio to handle high-DPI screens (defaults to window.devicePixelRatio).
- * @returns A Promise that resolves with the cropped image.
+ * @param zoomPercent - The zoom percentage (e.g., 80 means scale up to 125%).
+ * @param dpr - (Optional) Device pixel ratio (default = window.devicePixelRatio).
+ * @returns A Promise that resolves to the final resized image (as data URL).
  */
-const cropImage = (
+export const cropAndResizeImage = (
   dataUrl: string,
   rect: Rect,
+  zoomPercent: number,
   dpr: number = window.devicePixelRatio,
 ): Promise<Task['image']> =>
   new Promise((resolve, reject) => {
@@ -58,9 +60,11 @@ const cropImage = (
     img.src = dataUrl;
 
     img.onload = () => {
+      const scale = 100 / zoomPercent;
+
       const canvas = document.createElement('canvas');
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
+      canvas.width = rect.width * dpr * scale;
+      canvas.height = rect.height * dpr * scale;
 
       const ctx = canvas.getContext('2d')!;
       ctx.drawImage(
@@ -71,53 +75,20 @@ const cropImage = (
         rect.height * dpr,
         0,
         0,
-        rect.width * dpr,
-        rect.height * dpr,
+        canvas.width,
+        canvas.height,
       );
-
-      try {
-        const dataUrl = canvas.toDataURL('image/png');
-        resolve(dataUrl);
-      } catch {
-        reject(new Error('cropImage: failed to create a data URL.'));
-      }
-    };
-  });
-
-/**
- * Resizes the given DataURL image by the specified zoom percentage.
- *
- * @param image DataURL string of the image to resize.
- * @param zoomPercent The zoom percentage (e.g., 80 for 80% zoom).
- * @returns A new DataURL string of the resized image.
- */
-export const resizeImage = (image: Task['image'], zoomPercent: number): Promise<Task['image']> =>
-  new Promise((resolve, reject) => {
-    const img = new Image();
-    img.src = image;
-
-    img.onload = () => {
-      const scale = 100 / zoomPercent;
-      const newWidth = img.width * scale;
-      const newHeight = img.height * scale;
-
-      const canvas = document.createElement('canvas');
-      canvas.width = newWidth;
-      canvas.height = newHeight;
-
-      const ctx = canvas.getContext('2d')!;
-      ctx.drawImage(img, 0, 0, newWidth, newHeight);
 
       try {
         const resizedDataUrl = canvas.toDataURL('image/png');
         resolve(resizedDataUrl);
       } catch {
-        reject(new Error('resizeImage: failed to create a data URL.'));
+        reject(new Error('cropAndResizeImage: failed to create a data URL.'));
       }
     };
 
     img.onerror = () => {
-      reject(new Error('resizeImage: failed to load image.'));
+      reject(new Error('cropAndResizeImage: failed to load image.'));
     };
   });
 
