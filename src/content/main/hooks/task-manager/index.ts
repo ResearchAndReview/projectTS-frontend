@@ -31,7 +31,7 @@ export const useTaskManager = () => {
           startPolling(taskId);
         } catch (error) {
           console.error(error);
-          toast.error('번역 요청에 실패했습니다. 다시 시도해주세요.');
+          toast.error('번역 요청에 실패했습니다.');
         }
       });
     },
@@ -92,18 +92,21 @@ const useTaskPolling = (
       const interval = setInterval(async () => {
         if (!taskId) return;
 
-        const { status, captions } = await pollTask(taskId);
+        try {
+          const { status, captions, reason } = await pollTask(taskId);
 
-        if (status === 'error') {
-          // TODO: Add error handling logic
+          if (status === 'error') {
+            toast.error(`번역에 실패했습니다: ${reason}`);
+            stopPolling(taskId);
+            return;
+          }
 
-          stopPolling(taskId);
-          return;
-        }
+          setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, status, captions } : t)));
 
-        setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, status, captions } : t)));
-
-        if (status === 'success') {
+          if (status === 'success') stopPolling(taskId);
+        } catch (error) {
+          console.error(error);
+          toast.error(`번역에 실패했습니다: ${error}`);
           stopPolling(taskId);
         }
       }, time);
