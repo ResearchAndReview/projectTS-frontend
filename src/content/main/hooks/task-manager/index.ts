@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import { MessageTo, Rect, Task } from '@/types';
 import { afterPaint, createTask, pollTask, requestScreenshot } from './utils';
 
@@ -29,9 +30,8 @@ export const useTaskManager = () => {
           setTasks((prev) => [...prev, newTask]);
           startPolling(taskId);
         } catch (error) {
-          console.error('requestTask caughted an error.', error);
-
-          // TODO: handle image, taskId error here
+          console.error(error);
+          toast.error('번역 요청에 실패했습니다. 다시 시도해주세요.');
         }
       });
     },

@@ -1,3 +1,4 @@
+import { Toaster } from 'react-hot-toast';
 import { Rect } from '@/types';
 import { DragController, TranslationOverlay } from '../components';
 import { useDragState, useTaskManager } from './hooks';
@@ -13,6 +14,7 @@ export const Main = () => {
 
   return (
     <>
+      <Toaster position="bottom-center" />
       <TranslationOverlay tasks={tasks} />
       {dragState === 'DRAG' && <DragController onComplete={handleComplete} />}
     </>
