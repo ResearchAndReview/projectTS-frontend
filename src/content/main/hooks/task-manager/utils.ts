@@ -69,8 +69,8 @@ export const cropAndResizeImage = (
       const scale = 100 / zoomPercent;
 
       const canvas = document.createElement('canvas');
-      canvas.width = rect.width * dpr * scale;
-      canvas.height = rect.height * dpr * scale;
+      canvas.width = rect.width * scale; // should ignore dpr
+      canvas.height = rect.height * scale;
 
       const ctx = canvas.getContext('2d')!;
       ctx.drawImage(
