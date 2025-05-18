@@ -86,6 +86,18 @@ const pollTask = async (taskId: string, sendResponse: SendResponse) => {
             text: 'test 2',
             translation: '테스트 2',
           },
+          {
+            id: 'random-id-3',
+            rect: { x: 32, y: 96, width: 32, height: 32 },
+            text: 'test 3',
+            translation: '테스트 3',
+          },
+          {
+            id: 'random-id-4',
+            rect: { x: 32, y: 128, width: 32, height: 32 },
+            text: 'test 4',
+            translation: '테스트 4',
+          },
         ],
         reason: undefined,
       },

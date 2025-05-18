@@ -19,9 +19,12 @@ interface FrameProps {
 interface NoteProps {
   rect: Task['rect'];
   translation: Task['captions'][number]['translation'];
+  onClick: () => void;
 }
 
-interface NoteBodyProps extends NoteProps {
+interface NoteBodyProps {
+  rect: Task['rect'];
+  translation: Task['captions'][number]['translation'];
   hover: boolean;
 }
 
@@ -38,7 +41,7 @@ export const Frame = ({ rect, children, loading }: FrameProps) => {
   );
 };
 
-export const Note = ({ rect, translation }: NoteProps) => {
+export const Note = ({ rect, translation, onClick }: NoteProps) => {
   const [hover, setHover] = useState(false);
   const top = rect.y;
   const left = rect.x;
@@ -48,6 +51,7 @@ export const Note = ({ rect, translation }: NoteProps) => {
       style={{ top, left, width: rect.width, height: rect.height }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
+      onClick={onClick}
     >
       <NoteFloatComponent hover={hover} loading={!translation} />
       {translation && <NoteBody rect={rect} translation={translation} hover={hover} />}
