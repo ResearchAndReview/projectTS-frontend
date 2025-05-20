@@ -1,33 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
-import { RecoveryPayload, Task } from '@/types';
+import { RecoveryPayload } from '@/types';
 import * as S from './styles';
 
 interface Props {
-  task: Task;
-  focusedCaptionId: string | null;
+  captions: RecoveryPayload;
+  inputRefs: React.RefObject<(HTMLInputElement | null)[]>;
   onClose: () => void;
-  onSubmit: (data: RecoveryPayload) => void;
+  onSubmit: () => void;
+  onChange: (index: number, value: string) => void;
 }
 
-export const CaptionEditModal = ({ task, focusedCaptionId, onClose, onSubmit }: Props) => {
-  const [captions, setCaptions] = useState<RecoveryPayload>(
-    task.captions.map(({ id, text }) => ({ id, text })),
-  );
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-  useEffect(() => {
-    if (!focusedCaptionId) return;
-    const index = captions.findIndex((c) => c.id === focusedCaptionId);
-    const el = inputRefs.current[index];
-    if (el) el.focus();
-  }, [focusedCaptionId, captions]);
-
-  const handleChange = (index: number, value: string) => {
-    const updated = [...captions];
-    updated[index] = { ...updated[index], text: value };
-    setCaptions(updated);
-  };
-
+export const CaptionEditModal = ({ captions, inputRefs, onClose, onSubmit, onChange }: Props) => {
   return (
     <S.Wrapper>
       <S.Header>
@@ -44,14 +26,14 @@ export const CaptionEditModal = ({ task, focusedCaptionId, onClose, onSubmit }: 
                 inputRefs.current[i] = el;
               }}
               value={caption.text}
-              onChange={(e) => handleChange(i, e.target.value)}
+              onChange={(e) => onChange(i, e.target.value)}
             />
           </S.InputGroup>
         ))}
       </S.Body>
 
       <S.Footer>
-        <S.SaveButton onClick={() => onSubmit(captions)}>저장 및 재번역</S.SaveButton>
+        <S.SaveButton onClick={onSubmit}>저장 및 재번역</S.SaveButton>
       </S.Footer>
     </S.Wrapper>
   );

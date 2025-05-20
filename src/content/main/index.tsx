@@ -6,30 +6,31 @@ import { useCaptionEditModal, useDragState, useTaskManager } from './hooks';
 export const Main = () => {
   const { dragState, setDragState } = useDragState();
   const { tasks, requestTask, requestRetry } = useTaskManager();
-  const { close, open, isOpen, selectedTask, focusedCaptionId } = useCaptionEditModal();
+  const { close, handleNoteClick, handleChange, captions, inputRefs, taskId } =
+    useCaptionEditModal();
 
   const handleComplete = (rect: Rect) => {
     setDragState('IDLE');
     requestTask(rect);
   };
 
-  const handleNoteClick = (taskId: string, captionId: string) => {
-    const task = tasks.find((t) => t.id === taskId);
-    if (!task) return;
-    open(task, captionId);
+  const onRecoverySubmit = () => {
+    if (!taskId || !captions) return;
+    requestRetry(taskId, captions);
+    close();
   };
+
+  const isModalOpen = taskId && captions;
 
   return (
     <>
-      {isOpen && selectedTask && (
+      {isModalOpen && (
         <CaptionEditModal
-          task={selectedTask}
-          focusedCaptionId={focusedCaptionId}
+          captions={captions}
+          inputRefs={inputRefs}
           onClose={close}
-          onSubmit={(data) => {
-            requestRetry(selectedTask.id, data);
-            close();
-          }}
+          onChange={handleChange}
+          onSubmit={onRecoverySubmit}
         />
       )}
 

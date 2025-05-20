@@ -4,7 +4,7 @@ import { OverlayRoot } from './styles';
 
 interface Props {
   tasks: Task[];
-  onNoteClick: (taskId: Task['id'], captionId: Caption['id']) => void;
+  onNoteClick: (task: Task, captionId: Caption['id']) => void;
 }
 
 export const TranslationOverlay = ({ tasks, onNoteClick }: Props) => {
@@ -19,7 +19,7 @@ export const TranslationOverlay = ({ tasks, onNoteClick }: Props) => {
               key={`note#${caption.id}`}
               rect={caption.rect}
               translation={caption.translation}
-              onClick={() => onNoteClick(task.id, caption.id)}
+              onClick={() => onNoteClick(task, caption.id)}
             />
           ))}
         </Frame>
