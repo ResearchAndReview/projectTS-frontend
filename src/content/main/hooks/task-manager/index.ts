@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { MessageTo, Rect, Task } from '@/types';
-import { afterPaint, createTask, pollTask, requestScreenshot } from './utils';
+import { MessageTo, RecoveryPayload, Rect, Task } from '@/types';
+import { afterPaint, createTask, pollTask, requestScreenshot, retryTranslation } from './utils';
 
 export const useTaskManager = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -38,11 +38,29 @@ export const useTaskManager = () => {
     [startPolling],
   );
 
+  /**
+   * Request recovery on OCR failures.
+   */
+  const requestRetry = useCallback(
+    async (taskId: string, data: RecoveryPayload) => {
+      try {
+        const message = await retryTranslation(data);
+        toast.success(message);
+        startPolling(taskId);
+      } catch (error) {
+        console.error(error);
+        toast.error('재번역 요청에 실패했습니다.');
+      }
+    },
+    [startPolling],
+  );
+
   useMessageHandler(tasks);
 
   return {
     tasks,
     requestTask,
+    requestRetry,
   };
 };
 

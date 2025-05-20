@@ -1,3 +1,4 @@
+import { RecoveryPayload } from '@/types';
 import { TaskPollResponse } from '@/types/task/server';
 
 export const DevCreateResponse = { success: true, data: { taskId: 'environment-development' } };
@@ -46,8 +47,24 @@ export const taskResultsMapper = ({
   originalText,
   translatedText,
 }: TaskPollResponse['taskResults'][number]) => ({
-  id: `${ocrResultId};${transResultId}`,
+  id: `${ocrResultId},${transResultId}`,
   rect: { x, y, width, height },
   text: originalText,
   translation: translatedText,
 });
+
+export const retryTaskMapper = ({ id, text }: RecoveryPayload[number]) => {
+  const [ocrResultId, transResultId] = id.split(',').map(Number);
+
+  if (Number.isNaN(ocrResultId) || Number.isNaN(transResultId)) {
+    throw new Error(`Unexpected id format: ${id}`);
+  }
+
+  return {
+    ocrResultId,
+    transResultId,
+    originalText: text,
+    translateFrom: 'ja-JP',
+    translateTo: 'ko-KR',
+  };
+};

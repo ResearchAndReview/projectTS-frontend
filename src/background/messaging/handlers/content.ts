@@ -1,8 +1,8 @@
 import { api } from '@/lib/api';
 import { ENVIRONMENT } from '@/lib/utils';
-import { Message, Task } from '@/types';
+import { Message, RecoveryPayload, Task } from '@/types';
 import { TaskPollResponse } from '@/types/task/server';
-import { DevCreateResponse, DevPollResponse, taskResultsMapper } from './utils';
+import { DevCreateResponse, DevPollResponse, retryTaskMapper, taskResultsMapper } from './utils';
 
 type SendResponse = Parameters<Parameters<typeof chrome.runtime.onMessage.addListener>[0]>[2];
 
@@ -98,6 +98,26 @@ const pollTask = async (taskId: string, sendResponse: SendResponse) => {
   }
 };
 
+const retryTask = async (data: RecoveryPayload, sendResponse: SendResponse) => {
+  if (ENVIRONMENT === 'dev') {
+    sendResponse({ success: true, data: { message: JSON.stringify(data) } });
+    return;
+  }
+
+  try {
+    const { message } = await api<{ message: string }>({
+      method: 'post',
+      url: 'task/recovery-list',
+      options: { json: data.map(retryTaskMapper) },
+    });
+
+    sendResponse({ success: true, data: { message } });
+  } catch (error) {
+    console.error('[retryTranslation] error:', error);
+    sendResponse({ success: false, error: String(error) });
+  }
+};
+
 // Content message handler (call appropriate logic for each message)
 
 export const handleContentMessages = (
@@ -123,6 +143,11 @@ export const handleContentMessages = (
 
     case 'POLL_TASK': {
       pollTask(payload.taskId, sendResponse);
+      return true;
+    }
+
+    case 'RETRY_TASK': {
+      retryTask(payload.data, sendResponse);
       return true;
     }
 

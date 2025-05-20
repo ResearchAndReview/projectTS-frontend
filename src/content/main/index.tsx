@@ -5,7 +5,7 @@ import { useCaptionEditModal, useDragState, useTaskManager } from './hooks';
 
 export const Main = () => {
   const { dragState, setDragState } = useDragState();
-  const { tasks, requestTask } = useTaskManager();
+  const { tasks, requestTask, requestRetry } = useTaskManager();
   const { close, open, isOpen, selectedTask, focusedCaptionId } = useCaptionEditModal();
 
   const handleComplete = (rect: Rect) => {
@@ -26,8 +26,8 @@ export const Main = () => {
           task={selectedTask}
           focusedCaptionId={focusedCaptionId}
           onClose={close}
-          onSubmit={(captions) => {
-            console.log('[제출된 캡션]', captions);
+          onSubmit={(data) => {
+            requestRetry(selectedTask.id, data);
             close();
           }}
         />

@@ -1,5 +1,5 @@
 import { sendRuntimeMessage } from '@/lib/utils';
-import { Rect, Task, TaskPollResponse } from '@/types';
+import { RecoveryPayload, Rect, Task, TaskPollResponse } from '@/types';
 
 /**
  * Submits the cropped image and returns the created task ID.
@@ -25,6 +25,20 @@ export const pollTask = async (taskId: string): Promise<TaskPollResponse> => {
   });
 
   if (response.success) return response.data;
+
+  throw response.error;
+};
+
+/**
+ * Submits task recovery request and returns the task ID back.
+ */
+export const retryTranslation = async (data: RecoveryPayload) => {
+  const response = await sendRuntimeMessage({
+    type: 'RETRY_TASK',
+    payload: { data },
+  });
+
+  if (response.success) return response.data.message;
 
   throw response.error;
 };

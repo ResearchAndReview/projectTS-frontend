@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
-import { Caption, Task } from '@/types';
+import { RecoveryPayload, Task } from '@/types';
 import * as S from './styles';
 
 interface Props {
   task: Task;
   focusedCaptionId: string | null;
   onClose: () => void;
-  onSubmit: (captions: Caption[]) => void;
+  onSubmit: (data: RecoveryPayload) => void;
 }
 
 export const CaptionEditModal = ({ task, focusedCaptionId, onClose, onSubmit }: Props) => {
-  const [captions, setCaptions] = useState<Caption[]>(task.captions);
+  const [captions, setCaptions] = useState<RecoveryPayload>(
+    task.captions.map(({ id, text }) => ({ id, text })),
+  );
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {

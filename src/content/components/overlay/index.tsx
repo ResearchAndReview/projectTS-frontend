@@ -1,4 +1,4 @@
-import { Caption, Task } from '@/types/task';
+import { Caption, Task } from '@/types';
 import { Frame, Note } from './components';
 import { OverlayRoot } from './styles';
 

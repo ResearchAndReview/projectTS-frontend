@@ -21,3 +21,8 @@ export type TaskPollResponse =
   | { status: 'pending'; captions: Caption[]; reason: undefined }
   | { status: 'success'; captions: Caption[]; reason: undefined }
   | { status: 'error'; captions: undefined; reason: string };
+
+export type RecoveryPayload = {
+  id: string;
+  text: string;
+}[];
