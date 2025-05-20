@@ -1,6 +1,8 @@
 import { api } from '@/lib/api';
 import { ENVIRONMENT } from '@/lib/utils';
 import { Message, Task } from '@/types';
+import { TaskPollResponse } from '@/types/task/server';
+import { DevCreateResponse, DevPollResponse, taskResultsMapper } from './utils';
 
 type SendResponse = Parameters<Parameters<typeof chrome.runtime.onMessage.addListener>[0]>[2];
 
@@ -24,7 +26,7 @@ const captureScreenshot = async (windowId: number, tabId: number, sendResponse: 
 
 const createTask = async (image: Task['image'], sendResponse: SendResponse) => {
   if (ENVIRONMENT === 'dev') {
-    sendResponse({ success: true, data: { taskId: 'environment-development' } });
+    sendResponse(DevCreateResponse);
     return;
   }
 
@@ -54,108 +56,42 @@ const createTask = async (image: Task['image'], sendResponse: SendResponse) => {
   }
 };
 
-type TempTaskPollResponse = {
-  status: 'success' | 'pending' | 'failed';
-  taskResults: {
-    ocrResultId: number;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    originalText: string;
-    translatedText: string;
-  }[];
-};
-
 const pollTask = async (taskId: string, sendResponse: SendResponse) => {
   if (ENVIRONMENT === 'dev') {
-    sendResponse({
-      success: true,
-      data: {
-        status: 'success',
-        captions: [
-          {
-            id: 'random-id-1',
-            rect: { x: 32, y: 32, width: 32, height: 32 },
-            text: 'test 1',
-            translation: '테스트 1',
-          },
-          {
-            id: 'random-id-2',
-            rect: { x: 32, y: 64, width: 32, height: 32 },
-            text: 'test 2',
-            translation: '테스트 2',
-          },
-          {
-            id: 'random-id-3',
-            rect: { x: 32, y: 96, width: 32, height: 32 },
-            text: 'test 3',
-            translation: '테스트 3',
-          },
-          {
-            id: 'random-id-4',
-            rect: { x: 32, y: 128, width: 32, height: 32 },
-            text: 'test 4',
-            translation: '테스트 4',
-          },
-        ],
-        reason: undefined,
-      },
-    });
-
+    sendResponse(DevPollResponse);
     return;
   }
 
   try {
-    const result = await api<TempTaskPollResponse>({
+    const result = await api<TaskPollResponse>({
       method: 'get',
       url: 'task/status',
-      options: {
-        searchParams: { taskId },
-      },
+      options: { searchParams: { taskId } },
     });
 
-    switch (result.status) {
-      case 'failed':
-        sendResponse({
-          success: true,
-          data: { status: 'error', reason: 'Failed to fetch task status' },
-        });
-        return;
-      case 'pending':
-        sendResponse({
-          success: true,
-          data: {
-            status: 'pending',
-            reason: undefined,
-            captions: result.taskResults.map((i) => ({
-              id: crypto.randomUUID(),
-              rect: { x: i.x, y: i.y, width: i.width, height: i.height },
-              text: i.originalText,
-              translation: i.translatedText,
-            })),
-          },
-        });
-        return;
-      case 'success':
-        sendResponse({
-          success: true,
-          data: {
-            status: 'success',
-            reason: undefined,
-            captions: result.taskResults.map((i) => ({
-              id: crypto.randomUUID(),
-              rect: { x: i.x, y: i.y, width: i.width, height: i.height },
-              text: i.originalText,
-              translation: i.translatedText,
-            })),
-          },
-        });
-        return;
-      default:
-        // never
-        throw new Error(`unknown status ${result.status}`);
+    if (result.status === 'pending' || result.status === 'success') {
+      const { status, taskResults } = result as TaskPollResponse<'pending' | 'success'>;
+
+      sendResponse({
+        success: true,
+        data: { status, captions: taskResults.map(taskResultsMapper), reason: undefined },
+      });
+
+      return;
     }
+
+    if (result.status === 'failed') {
+      const { task } = result as TaskPollResponse<'failed'>;
+
+      sendResponse({
+        success: true,
+        data: { status: 'error', captions: [], reason: task.failCause },
+      });
+
+      return;
+    }
+
+    throw new Error(`Unexpected status: ${result.status}`);
   } catch (error) {
     console.error('[pollTask] error', error);
     sendResponse({ success: false, error: String(error) });

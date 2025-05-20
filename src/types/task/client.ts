@@ -1,4 +1,4 @@
-import { Rect } from './geometry';
+import { Rect } from '../geometry';
 
 export type TaskStatus = 'pending' | 'success' | 'error';
 
