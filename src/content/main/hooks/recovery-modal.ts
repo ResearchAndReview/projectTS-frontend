@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { RecoveryPayload, Task } from '@/types/task';
 
-export const useCaptionEditModal = () => {
+export const useRecoveryModal = () => {
   const [taskId, setTaskId] = useState<string | null>(null);
   const [captions, setCaptions] = useState<RecoveryPayload | null>(null);
   const [clickedCaptionId, setClickedCaptionId] = useState<string | null>(null);

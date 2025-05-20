@@ -32,9 +32,9 @@ export const pollTask = async (taskId: string): Promise<TaskPollResponse> => {
 /**
  * Submits task recovery request and returns the task ID back.
  */
-export const retryTranslation = async (data: RecoveryPayload) => {
+export const recoverTask = async (data: RecoveryPayload) => {
   const response = await sendRuntimeMessage({
-    type: 'RETRY_TASK',
+    type: 'RECOVER_TASK',
     payload: { data },
   });
 

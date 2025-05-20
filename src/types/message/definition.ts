@@ -27,7 +27,7 @@ export interface MessageMap {
     response: { tasks: Task[] };
     meta: { from: 'popup'; to: 'content' };
   };
-  RETRY_TASK: {
+  RECOVER_TASK: {
     payload: {
       data: RecoveryPayload;
     };

@@ -1,13 +1,12 @@
 import { Toaster } from 'react-hot-toast';
 import { Rect } from '@/types';
 import { CaptionEditModal, DragController, TranslationOverlay } from '../components';
-import { useCaptionEditModal, useDragState, useTaskManager } from './hooks';
+import { useDragState, useRecoveryModal, useTaskManager } from './hooks';
 
 export const Main = () => {
   const { dragState, setDragState } = useDragState();
-  const { tasks, requestTask, requestRetry } = useTaskManager();
-  const { close, handleNoteClick, handleChange, captions, inputRefs, taskId } =
-    useCaptionEditModal();
+  const { tasks, requestTask, requestRecovery } = useTaskManager();
+  const { close, handleNoteClick, handleChange, captions, inputRefs, taskId } = useRecoveryModal();
 
   const handleComplete = (rect: Rect) => {
     setDragState('IDLE');
@@ -16,7 +15,7 @@ export const Main = () => {
 
   const onRecoverySubmit = () => {
     if (!taskId || !captions) return;
-    requestRetry(taskId, captions);
+    requestRecovery(taskId, captions);
     close();
   };
 

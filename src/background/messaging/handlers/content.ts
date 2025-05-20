@@ -98,7 +98,7 @@ const pollTask = async (taskId: string, sendResponse: SendResponse) => {
   }
 };
 
-const retryTask = async (data: RecoveryPayload, sendResponse: SendResponse) => {
+const recoverTask = async (data: RecoveryPayload, sendResponse: SendResponse) => {
   if (ENVIRONMENT === 'dev') {
     sendResponse({ success: true, data: { message: JSON.stringify(data) } });
     return;
@@ -146,8 +146,8 @@ export const handleContentMessages = (
       return true;
     }
 
-    case 'RETRY_TASK': {
-      retryTask(payload.data, sendResponse);
+    case 'RECOVER_TASK': {
+      recoverTask(payload.data, sendResponse);
       return true;
     }
 
