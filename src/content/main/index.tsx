@@ -15,7 +15,13 @@ export const Main = () => {
 
   const onRecoverySubmit = () => {
     if (!taskId || !captions) return;
-    requestRecovery(taskId, captions);
+
+    const original = tasks.find((i) => i.id === taskId)?.captions;
+    if (!original || original.length !== captions.length) return;
+
+    const filtered = captions.filter(({ text }, index) => original[index].text !== text);
+
+    requestRecovery(taskId, filtered);
     close();
   };
 
