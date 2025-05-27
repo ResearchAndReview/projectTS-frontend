@@ -14,6 +14,7 @@ export const Wrapper = styled.div`
   z-index: 9999;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 `;
 
 export const Header = styled.div`
@@ -29,6 +30,12 @@ export const CloseButton = styled.button`
   font-size: 14px;
 `;
 
+export const Description = styled.div`
+  margin: 4px 0 8px 0;
+  box-sizing: border-box;
+  color: #404040;
+`;
+
 export const Body = styled.div`
   flex: 1;
   overflow-y: auto;
@@ -37,7 +44,8 @@ export const Body = styled.div`
 `;
 
 export const InputGroup = styled.div`
-  margin-bottom: 12px;
+  margin-top: 12px;
+  width: 100%;
 `;
 
 export const Label = styled.label`
@@ -52,6 +60,7 @@ export const Input = styled.input`
   font-size: 14px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  box-sizing: border-box;
 `;
 
 export const Footer = styled.div`
@@ -63,7 +72,7 @@ export const SaveButton = styled.button`
   width: 100%;
   padding: 8px;
   font-size: 14px;
-  background-color: #4f46e5;
+  background-color: #7300ff;
   color: #fff;
   border: none;
   border-radius: 4px;

@@ -9,18 +9,22 @@ interface Props {
   onChange: (index: number, value: string) => void;
 }
 
-export const CaptionEditModal = ({ captions, inputRefs, onClose, onSubmit, onChange }: Props) => {
+export const RecoveryModal = ({ captions, inputRefs, onClose, onSubmit, onChange }: Props) => {
   return (
     <S.Wrapper>
       <S.Header>
-        <strong>OCR 텍스트 수정</strong>
+        <strong>텍스트 수정 및 재번역 요청</strong>
         <S.CloseButton onClick={onClose}>닫기</S.CloseButton>
       </S.Header>
+
+      <S.Description>
+        잘못 인식된 텍스트를 수정하고 하단의 `저장 및 재번역` 버튼을 클릭해주세요.
+      </S.Description>
 
       <S.Body>
         {captions.map((caption, i) => (
           <S.InputGroup key={caption.id}>
-            <S.Label>문장 {i + 1}</S.Label>
+            <S.Label>캡션 {i + 1}</S.Label>
             <S.Input
               ref={(el) => {
                 inputRefs.current[i] = el;

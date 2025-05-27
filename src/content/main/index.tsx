@@ -1,6 +1,6 @@
 import { Toaster } from 'react-hot-toast';
 import { Rect } from '@/types';
-import { CaptionEditModal, DragController, TranslationOverlay } from '../components';
+import { DragController, RecoveryModal, TranslationOverlay } from '../components';
 import { useDragState, useRecoveryModal, useTaskManager } from './hooks';
 
 export const Main = () => {
@@ -30,7 +30,7 @@ export const Main = () => {
   return (
     <>
       {isModalOpen && (
-        <CaptionEditModal
+        <RecoveryModal
           captions={captions}
           inputRefs={inputRefs}
           onClose={close}
