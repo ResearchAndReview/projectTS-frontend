@@ -29,6 +29,8 @@ export const Main = () => {
 
   return (
     <>
+      <Toaster position="bottom-center" />
+      <TranslationOverlay tasks={tasks} onNoteClick={handleNoteClick} />
       {isModalOpen && (
         <RecoveryModal
           captions={captions}
@@ -38,9 +40,6 @@ export const Main = () => {
           onSubmit={onRecoverySubmit}
         />
       )}
-
-      <Toaster position="bottom-center" />
-      <TranslationOverlay tasks={tasks} onNoteClick={handleNoteClick} />
       {dragState === 'DRAG' && <DragController onComplete={handleComplete} />}
     </>
   );

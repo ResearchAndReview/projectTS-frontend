@@ -11,7 +11,7 @@ export const OverlayRoot = styled.div`
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 2147483646;
+  z-index: 100;
 `;
 
 export const Frame = styled.div<{ loading?: boolean }>`

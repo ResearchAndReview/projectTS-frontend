@@ -14,7 +14,17 @@ export const RecoveryModal = ({ captions, inputRefs, onClose, onSubmit, onChange
     <S.Wrapper>
       <S.Header>
         <strong>텍스트 수정 및 재번역 요청</strong>
-        <S.CloseButton onClick={onClose}>닫기</S.CloseButton>
+        <S.CloseButton onClick={onClose}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            height="20px"
+            viewBox="0 -960 960 960"
+            width="20px"
+            fill="#1f1f1f"
+          >
+            <path d="m291-240-51-51 189-189-189-189 51-51 189 189 189-189 51 51-189 189 189 189-51 51-189-189-189 189Z" />
+          </svg>
+        </S.CloseButton>
       </S.Header>
 
       <S.Description>

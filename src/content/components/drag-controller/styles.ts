@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 export const Overlay = styled.div`
   position: fixed;
   inset: 0;
-  z-index: 999999;
+  z-index: 300;
   cursor: crosshair;
   user-select: none;
   background-color: transparent;

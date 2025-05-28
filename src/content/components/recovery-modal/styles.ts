@@ -7,14 +7,16 @@ export const Wrapper = styled.div`
   right: 0;
   width: 320px;
   height: 100vh;
+  z-index: 200;
   background-color: #fff;
   border-left: 1px solid #ccc;
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
   padding: 16px;
-  z-index: 9999;
+  padding-top: 24px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  color: #000;
 `;
 
 export const Header = styled.div`
@@ -24,10 +26,28 @@ export const Header = styled.div`
 `;
 
 export const CloseButton = styled.button`
+  position: absolute;
+  top: 11px;
+  right: 10px;
+  user-select: none;
+  border-radius: 100%;
+  width: 32px;
+  height: 32px;
+
   background: transparent;
   border: none;
   cursor: pointer;
   font-size: 14px;
+  color: #000;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+
+  > svg {
+    transform: translateY(2px);
+  }
 `;
 
 export const Description = styled.div`
@@ -61,6 +81,7 @@ export const Input = styled.input`
   border: 1px solid #ddd;
   border-radius: 4px;
   box-sizing: border-box;
+  color: #000;
 `;
 
 export const Footer = styled.div`
