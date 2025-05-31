@@ -46,3 +46,13 @@ export const Tasks = styled.li`
 export const Placeholder = styled.div`
   padding: 16px 24px;
 `;
+
+export const Download = styled.div`
+  padding: 12px;
+  width: 100%;
+  text-align: right;
+
+  button {
+    text-decoration: underline;
+  }
+`;

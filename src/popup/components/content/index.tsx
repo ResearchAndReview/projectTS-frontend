@@ -1,7 +1,8 @@
 import { Dispatch, SetStateAction, useMemo } from 'react';
+import toast from 'react-hot-toast';
 import { Filter } from '@/popup/types';
 import { Task } from '@/types';
-import { Button, Placeholder, Tasks, Top } from './styles';
+import { Button, Download, Placeholder, Tasks, Top } from './styles';
 import { TaskThumbnail } from './task-thumbnail';
 
 const statusList = ['all', 'success', 'pending', 'error'] as const;
@@ -23,6 +24,25 @@ export const Content = ({ tasks: _tasks, filter, setFilter }: Props) => {
     [_tasks],
   );
 
+  const downloadHandler = () => {
+    if (tasks.success.length === 0) {
+      toast.error('다운로드 할 데이터가 없습니다.');
+      return;
+    }
+
+    const json = JSON.stringify(tasks.success, null, 2);
+
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'translation_tasks.json';
+    a.click();
+
+    URL.revokeObjectURL(url);
+  };
+
   const showPlaceholder = tasks[filter].length === 0;
 
   return (
@@ -43,14 +63,21 @@ export const Content = ({ tasks: _tasks, filter, setFilter }: Props) => {
         </ul>
       </Top>
 
-      {showPlaceholder && <Placeholder>No tasks were found.</Placeholder>}
+      {showPlaceholder && <Placeholder>아직 태스크가 없습니다.</Placeholder>}
 
       {!showPlaceholder && (
-        <Tasks>
-          {tasks[filter].map((task) => (
-            <TaskThumbnail key={task.id} task={task} />
-          ))}
-        </Tasks>
+        <>
+          <Tasks>
+            {tasks[filter].map((task) => (
+              <TaskThumbnail key={task.id} task={task} />
+            ))}
+          </Tasks>
+          <Download>
+            <Button active={false} disabled={false} onClick={downloadHandler}>
+              성공한 데이터 다운로드 ({tasks.success.length}건)
+            </Button>
+          </Download>
+        </>
       )}
     </>
   );
