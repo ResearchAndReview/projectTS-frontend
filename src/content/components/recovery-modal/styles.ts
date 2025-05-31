@@ -17,6 +17,7 @@ export const Wrapper = styled.div`
   flex-direction: column;
   box-sizing: border-box;
   color: #000;
+  font-size: 15px;
 `;
 
 export const Header = styled.div`
@@ -53,7 +54,7 @@ export const CloseButton = styled.button`
 export const Description = styled.div`
   margin: 4px 0 8px 0;
   box-sizing: border-box;
-  color: #404040;
+  color: #6a6a6a;
 `;
 
 export const Body = styled.div`
