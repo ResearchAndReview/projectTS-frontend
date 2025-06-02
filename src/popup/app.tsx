@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { Content } from './components/content';
-import { Footer } from './components/footer';
-import { Header } from './components/header';
+import { Toaster } from 'react-hot-toast';
+import { Content, Footer, Header } from './components';
 import { useTasksFromAllTabs } from './hooks';
 import { Filter } from './types';
 
@@ -10,10 +9,13 @@ export default function App() {
   const { tasks } = useTasksFromAllTabs();
 
   return (
-    <div>
-      <Header />
-      <Content tasks={tasks} filter={filter} setFilter={setFilter} />
-      <Footer />
-    </div>
+    <>
+      <div>
+        <Toaster position="bottom-center" />
+        <Header />
+        <Content tasks={tasks} filter={filter} setFilter={setFilter} />
+        <Footer />
+      </div>
+    </>
   );
 }

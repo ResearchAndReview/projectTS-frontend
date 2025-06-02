@@ -17,5 +17,8 @@
   "action": {
     "default_title": "comutrans",
     "default_popup": "index.html"
+  },
+  "icons": {
+    "128": "icon128.png"
   }
 }

@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-export const Top = styled.div`
+export const Heading = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 32px 16px 32px 24px;
@@ -10,12 +10,12 @@ export const Top = styled.div`
     font-weight: semibold;
   }
 
-  .buttons {
+  .filterButtons {
     display: flex;
   }
 `;
 
-export const Button = styled.button<{ disabled: boolean; active: boolean }>`
+export const FilterButton = styled.button<{ disabled: boolean; active: boolean }>`
   padding: 4px 8px;
   border: none;
   border-radius: 2px;
@@ -45,14 +45,5 @@ export const Tasks = styled.li`
 
 export const Placeholder = styled.div`
   padding: 16px 24px;
-`;
-
-export const Download = styled.div`
-  padding: 12px;
-  width: 100%;
-  text-align: right;
-
-  button {
-    text-decoration: underline;
-  }
+  font-size: 12px;
 `;

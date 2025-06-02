@@ -1,9 +1,9 @@
 import { Dispatch, SetStateAction, useMemo } from 'react';
-import toast from 'react-hot-toast';
 import { Filter } from '@/popup/types';
 import { Task } from '@/types';
-import { Button, Download, Placeholder, Tasks, Top } from './styles';
+import { ActionButton, Download, FilterButton, Heading, Placeholder, Tasks } from './styles';
 import { TaskThumbnail } from './task-thumbnail';
+import { downloadHandler } from './utils';
 
 const statusList = ['all', 'success', 'pending', 'error'] as const;
 
@@ -24,61 +24,39 @@ export const Content = ({ tasks: _tasks, filter, setFilter }: Props) => {
     [_tasks],
   );
 
-  const downloadHandler = () => {
-    if (tasks.success.length === 0) {
-      toast.error('다운로드 할 데이터가 없습니다.');
-      return;
-    }
-
-    const json = JSON.stringify(tasks.success, null, 2);
-
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'translation_tasks.json';
-    a.click();
-
-    URL.revokeObjectURL(url);
-  };
-
   const showPlaceholder = tasks[filter].length === 0;
 
   return (
     <>
-      <Top>
+      <Heading>
         <h2>TASKS</h2>
-        <ul className="buttons">
+        <ul className="filterButtons">
           {statusList.map((i) => (
-            <Button
+            <FilterButton
               active={i === filter}
               disabled={i !== 'all' && tasks[i].length === 0}
               key={`filter-button-${i}`}
               onClick={() => setFilter(i)}
             >
               {i}
-            </Button>
+            </FilterButton>
           ))}
         </ul>
-      </Top>
+      </Heading>
 
-      {showPlaceholder && <Placeholder>아직 태스크가 없습니다.</Placeholder>}
+      {showPlaceholder && <Placeholder>표시할 데이터가 없습니다.</Placeholder>}
 
       {!showPlaceholder && (
-        <>
-          <Tasks>
-            {tasks[filter].map((task) => (
-              <TaskThumbnail key={task.id} task={task} />
-            ))}
-          </Tasks>
-          <Download>
-            <Button active={false} disabled={false} onClick={downloadHandler}>
-              성공한 데이터 다운로드 ({tasks.success.length}건)
-            </Button>
-          </Download>
-        </>
+        <Tasks>
+          {tasks[filter].map((task) => (
+            <TaskThumbnail key={task.id} task={task} />
+          ))}
+        </Tasks>
       )}
+
+      <Download>
+        <ActionButton onClick={() => downloadHandler(tasks.success)}>데이터 다운로드</ActionButton>
+      </Download>
     </>
   );
 };

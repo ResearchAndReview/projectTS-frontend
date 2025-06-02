@@ -11,10 +11,8 @@ const Logo = styled.div`
   user-select: none;
 
   .logoImage {
-    width: 32px;
-    height: 32px;
-    border-radius: 4px;
-    background-color: #7300ff;
+    width: 36px;
+    height: 36px;
     margin-right: 12px;
   }
 
@@ -26,6 +24,7 @@ const Logo = styled.div`
 const Tabs = styled.div`
   display: flex;
   border-bottom: 1px solid #dde2e9;
+  user-select: none;
 `;
 
 const Tab = styled.div`
@@ -47,7 +46,7 @@ export const Header = () => {
   return (
     <div>
       <Logo>
-        <div className="logoImage" />
+        <img src="logo.png" className="logoImage" />
         <span>comu</span>
         <span>trans</span>
       </Logo>
