@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { loadFromStorage, saveToStorage } from '@/lib/utils';
+import { DisplayMode } from '@/types';
 import { Footer, Header, Setting, Status } from './components';
 import { useTasksFromAllTabs } from './hooks';
-import { DisplayMode, Filter, Tab } from './types';
+import { Filter, Tab } from './types';
 
 export default function App() {
   const [tab, setTab] = useState<Tab>('status');

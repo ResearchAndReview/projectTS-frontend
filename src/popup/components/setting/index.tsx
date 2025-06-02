@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
-import { DisplayMode } from '@/popup/types';
+import { DisplayMode } from '@/types';
 import { Button, Heading, HorizontalContainer, Label, Select, Wrapper } from './styles';
 
 interface Props {

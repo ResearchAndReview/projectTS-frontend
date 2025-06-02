@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import { Task } from '@/types';
+import { DisplayMode, Task } from '@/types';
 import { Frame as FrameComponent } from './styles';
 import {
   NoteBody as NoteBodyComponent,
@@ -20,6 +20,7 @@ interface NoteProps {
   rect: Task['rect'];
   translation: Task['captions'][number]['translation'];
   onClick: () => void;
+  displayMode: DisplayMode;
 }
 
 interface NoteBodyProps {
@@ -41,7 +42,7 @@ export const Frame = ({ rect, children, loading }: FrameProps) => {
   );
 };
 
-export const Note = ({ rect, translation, onClick }: NoteProps) => {
+export const Note = ({ rect, translation, onClick, displayMode }: NoteProps) => {
   const [hover, setHover] = useState(false);
   const top = rect.y;
   const left = rect.x;
@@ -53,8 +54,15 @@ export const Note = ({ rect, translation, onClick }: NoteProps) => {
       onMouseLeave={() => setHover(false)}
       onClick={onClick}
     >
-      <NoteFloatComponent hover={hover} loading={!translation} />
-      {translation && <NoteBody rect={rect} translation={translation} hover={hover} />}
+      {displayMode === 'hover' && (
+        <>
+          <NoteFloatComponent hover={hover} loading={!translation} />
+          {translation && <NoteBody rect={rect} translation={translation} hover={hover} />}
+        </>
+      )}
+      {displayMode === 'always' && translation && (
+        <NoteBody rect={rect} translation={translation} hover={!hover} />
+      )}
     </NoteComponent>
   );
 };

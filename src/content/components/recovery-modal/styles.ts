@@ -83,6 +83,7 @@ export const Input = styled.input`
   border-radius: 4px;
   box-sizing: border-box;
   color: #000;
+  background-color: #fff;
 `;
 
 export const Footer = styled.div`
