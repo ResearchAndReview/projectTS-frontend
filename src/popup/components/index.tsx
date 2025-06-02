@@ -1,3 +1,4 @@
 export { Header } from './header';
 export { Footer } from './footer';
-export { Content } from './content';
+export { Status } from './status';
+export { Setting } from './setting';

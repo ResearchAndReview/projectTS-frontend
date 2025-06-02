@@ -13,7 +13,7 @@ interface Props {
   setFilter: Dispatch<SetStateAction<Filter>>;
 }
 
-export const Content = ({ tasks: _tasks, filter, setFilter }: Props) => {
+export const Status = ({ tasks: _tasks, filter, setFilter }: Props) => {
   const tasks = useMemo(
     () => ({
       all: _tasks,

@@ -1,4 +1,11 @@
+import { Dispatch, SetStateAction } from 'react';
 import styled from '@emotion/styled';
+import { Tab as TabType } from '../types';
+
+interface Props {
+  tab: TabType;
+  setTab: Dispatch<SetStateAction<TabType>>;
+}
 
 const Logo = styled.div`
   font-size: 22px;
@@ -35,6 +42,11 @@ const Tab = styled.div`
   color: #485465;
   padding: 12px 24px;
   font-weight: semibold;
+  cursor: pointer;
+
+  &:hover {
+    color: #7300ff;
+  }
 
   &.active {
     color: #7300ff;
@@ -42,7 +54,7 @@ const Tab = styled.div`
   }
 `;
 
-export const Header = () => {
+export const Header = ({ tab, setTab }: Props) => {
   return (
     <div>
       <Logo>
@@ -51,7 +63,12 @@ export const Header = () => {
         <span>trans</span>
       </Logo>
       <Tabs>
-        <Tab className="active">STATUS</Tab>
+        <Tab className={tab === 'status' ? 'active' : ''} onClick={() => setTab('status')}>
+          STATUS
+        </Tab>
+        <Tab className={tab === 'setting' ? 'active' : ''} onClick={() => setTab('setting')}>
+          SETTING
+        </Tab>
       </Tabs>
     </div>
   );

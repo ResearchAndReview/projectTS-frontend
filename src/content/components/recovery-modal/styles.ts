@@ -17,7 +17,7 @@ export const Wrapper = styled.div`
   flex-direction: column;
   box-sizing: border-box;
   color: #000;
-  font-size: 15px;
+  font-size: 14px;
 `;
 
 export const Header = styled.div`
@@ -72,7 +72,7 @@ export const InputGroup = styled.div`
 export const Label = styled.label`
   display: block;
   margin-bottom: 4px;
-  font-size: 14px;
+  font-size: 12px;
 `;
 
 export const Input = styled.input`
