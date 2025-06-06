@@ -1,4 +1,4 @@
-type StorageKey = 'displayMode';
+type StorageKey = 'displayMode' | 'fontSize';
 
 export const saveToStorage = <T>(key: StorageKey, value: T): Promise<void> => {
   return new Promise((resolve, reject) => {

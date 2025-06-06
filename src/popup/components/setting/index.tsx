@@ -1,51 +1,29 @@
-import { Dispatch, SetStateAction } from 'react';
-import { DisplayMode } from '@/types';
-import { Button, Heading, HorizontalContainer, Label, Select, Wrapper } from './styles';
+import { DisplayMode, FontSize } from '@/types';
+import { DisplayModeSetting } from './sections/display-mode-setting';
+import { FontSizeSetting } from './sections/font-size-setting';
+import { LanguageSetting } from './sections/language-setting';
+import { Heading } from './styles';
 
 interface Props {
   displayMode: DisplayMode;
-  setDisplayMode: Dispatch<SetStateAction<DisplayMode>>;
+  setDisplayMode: (value: DisplayMode) => void;
+  fontSize: FontSize;
+  setFontSize: (value: FontSize) => void;
 }
 
-export const Setting = ({ displayMode, setDisplayMode }: Props) => {
+export const Setting = ({ displayMode, setDisplayMode, fontSize, setFontSize }: Props) => {
   return (
     <>
       <Heading>
-        <h2>LANGUAGE</h2>
+        <h2>디스플레이</h2>
       </Heading>
-      <HorizontalContainer>
-        <Wrapper>
-          <Label>Translate from</Label>
-          <Select>
-            <option>日本語</option>
-          </Select>
-        </Wrapper>
-        <Wrapper>
-          <Label>Translate into</Label>
-          <Select>
-            <option>한국어</option>
-          </Select>
-        </Wrapper>
-      </HorizontalContainer>
+      <FontSizeSetting fontSize={fontSize} setFontSize={setFontSize} />
+      <DisplayModeSetting displayMode={displayMode} setDisplayMode={setDisplayMode} />
+
       <Heading>
-        <h2>DISPLAY MODE</h2>
+        <h2>언어</h2>
       </Heading>
-      <HorizontalContainer>
-        <Button active={displayMode === 'hover'} onClick={() => setDisplayMode('hover')}>
-          <Marker />
-          <span>on hover</span>
-        </Button>
-        <Button active={displayMode === 'always'} onClick={() => setDisplayMode('always')}>
-          <Marker />
-          <span>always</span>
-        </Button>
-      </HorizontalContainer>
+      <LanguageSetting />
     </>
   );
 };
-
-const Marker = () => (
-  <div className="marker">
-    <div />
-  </div>
-);

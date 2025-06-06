@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import { DisplayMode, Task } from '@/types';
+import { DisplayMode, FontSize, Task } from '@/types';
 import { Frame as FrameComponent } from './styles';
 import {
   NoteBody as NoteBodyComponent,
@@ -20,12 +20,14 @@ interface NoteProps {
   rect: Task['rect'];
   translation: Task['captions'][number]['translation'];
   onClick: () => void;
+  fontSize: FontSize;
   displayMode: DisplayMode;
 }
 
 interface NoteBodyProps {
   rect: Task['rect'];
   translation: Task['captions'][number]['translation'];
+  fontSize: FontSize;
   hover: boolean;
 }
 
@@ -42,7 +44,7 @@ export const Frame = ({ rect, children, loading }: FrameProps) => {
   );
 };
 
-export const Note = ({ rect, translation, onClick, displayMode }: NoteProps) => {
+export const Note = ({ rect, translation, onClick, fontSize, displayMode }: NoteProps) => {
   const [hover, setHover] = useState(false);
   const top = rect.y;
   const left = rect.x;
@@ -57,22 +59,35 @@ export const Note = ({ rect, translation, onClick, displayMode }: NoteProps) => 
       {displayMode === 'hover' && (
         <>
           <NoteFloatComponent hover={hover} loading={!translation} />
-          {translation && <NoteBody rect={rect} translation={translation} hover={hover} />}
+          {translation && (
+            <NoteBody rect={rect} translation={translation} hover={hover} fontSize={fontSize} />
+          )}
         </>
       )}
-      {displayMode === 'always' && translation && (
-        <NoteBody rect={rect} translation={translation} hover={!hover} />
+      {displayMode === 'always' && (
+        <>
+          <NoteFloatComponent hover={hover} loading={!translation} />
+          {translation && (
+            <NoteBody rect={rect} translation={translation} hover={!hover} fontSize={fontSize} />
+          )}
+        </>
       )}
     </NoteComponent>
   );
 };
 
-const NoteBody = ({ translation, hover }: NoteBodyProps) => {
+const NoteBody = ({ translation, hover, fontSize }: NoteBodyProps) => {
   const top = 0;
   const left = 0;
+  const size =
+    [
+      { key: 'sm', size: 13 },
+      { key: 'md', size: 16 },
+      { key: 'lg', size: 20 },
+    ].find(({ key }) => key === fontSize)?.size ?? 13;
 
   return (
-    <NoteBodyComponent hover={hover} style={{ top, left }}>
+    <NoteBodyComponent hover={hover} style={{ top, left, fontSize: size }}>
       {translation}
     </NoteBodyComponent>
   );
