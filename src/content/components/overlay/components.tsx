@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import { DisplayMode, FontSize, Task } from '@/types';
-import { Frame as FrameComponent } from './styles';
+import { FrameCloseButton, Frame as FrameComponent } from './styles';
 import {
   NoteBody as NoteBodyComponent,
   Note as NoteComponent,
@@ -34,11 +34,16 @@ interface NoteBodyProps {
 // Components
 
 export const Frame = ({ rect, children, loading }: FrameProps) => {
+  const [closed, setClosed] = useState(false);
+
   const top = rect.y;
   const left = rect.x;
 
+  if (closed) return null;
+
   return (
     <FrameComponent style={{ top, left, width: rect.width, height: rect.height }} loading={loading}>
+      <FrameCloseButton onClick={() => setClosed(true)}>×</FrameCloseButton>
       {children}
     </FrameComponent>
   );

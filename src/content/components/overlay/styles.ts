@@ -16,13 +16,18 @@ export const OverlayRoot = styled.div`
 
 export const Frame = styled.div<{ loading?: boolean }>`
   position: absolute;
+  pointer-events: auto;
   background-color: transparent;
-  border: 1px solid #7300ff00;
+  border: 1px solid #7300ff30;
   z-index: 0;
 
   transition:
     border-color 0.5s ease,
     background-color 0.5s ease;
+
+  &:hover > button {
+    opacity: 1;
+  }
 
   ${(props) =>
     props.loading &&
@@ -30,6 +35,18 @@ export const Frame = styled.div<{ loading?: boolean }>`
       animation: ${pulse} 4s ease-in-out infinite;
       border: 1px solid #7300ffff;
     `}
+`;
+
+export const FrameCloseButton = styled.button`
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
 `;
 
 export const Note = styled.div`
