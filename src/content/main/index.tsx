@@ -8,9 +8,9 @@ export const Main = () => {
   const { tasks, requestTask, requestRecovery } = useTaskManager();
   const { close, handleNoteClick, handleChange, captions, inputRefs, taskId } = useRecoveryModal();
 
-  const handleComplete = (rect: Rect) => {
+  const handleComplete = (rect: Rect, ignore?: boolean) => {
     setDragState('IDLE');
-    requestTask(rect);
+    if (!ignore) requestTask(rect);
   };
 
   const onRecoverySubmit = () => {

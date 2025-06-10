@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { Point, Rect } from '@/types';
+import { isRectBigEnough } from './utils';
 
-export const useRect = (onComplete: (rect: Rect) => void) => {
+export const useRect = (onComplete: (rect: Rect, ignore?: boolean) => void) => {
   const [start, setStart] = useState<Point | null>(null);
   const [current, setCurrent] = useState<Point | null>(null);
 
@@ -23,7 +25,14 @@ export const useRect = (onComplete: (rect: Rect) => void) => {
     };
 
     const onMouseUp = () => {
-      if (rect) onComplete({ ...rect, y: rect.y + window.scrollY });
+      if (!rect) return;
+
+      if (isRectBigEnough(rect)) {
+        onComplete({ ...rect, y: rect.y + window.scrollY });
+      } else {
+        toast.error('박스가 너무 작습니다.');
+        onComplete(rect, true);
+      }
       setStart(null);
       setCurrent(null);
     };
