@@ -1,4 +1,11 @@
+import { Dispatch, SetStateAction } from 'react';
 import styled from '@emotion/styled';
+import { Tab as TabType } from '../types';
+
+interface Props {
+  tab: TabType;
+  setTab: Dispatch<SetStateAction<TabType>>;
+}
 
 const Logo = styled.div`
   font-size: 22px;
@@ -11,10 +18,8 @@ const Logo = styled.div`
   user-select: none;
 
   .logoImage {
-    width: 32px;
-    height: 32px;
-    border-radius: 4px;
-    background-color: #7300ff;
+    width: 36px;
+    height: 36px;
     margin-right: 12px;
   }
 
@@ -26,6 +31,7 @@ const Logo = styled.div`
 const Tabs = styled.div`
   display: flex;
   border-bottom: 1px solid #dde2e9;
+  user-select: none;
 `;
 
 const Tab = styled.div`
@@ -36,6 +42,11 @@ const Tab = styled.div`
   color: #485465;
   padding: 12px 24px;
   font-weight: semibold;
+  cursor: pointer;
+
+  &:hover {
+    color: #7300ff;
+  }
 
   &.active {
     color: #7300ff;
@@ -43,16 +54,21 @@ const Tab = styled.div`
   }
 `;
 
-export const Header = () => {
+export const Header = ({ tab, setTab }: Props) => {
   return (
     <div>
       <Logo>
-        <div className="logoImage" />
+        <img src="logo.png" className="logoImage" />
         <span>comu</span>
         <span>trans</span>
       </Logo>
       <Tabs>
-        <Tab className="active">STATUS</Tab>
+        <Tab className={tab === 'status' ? 'active' : ''} onClick={() => setTab('status')}>
+          STATUS
+        </Tab>
+        <Tab className={tab === 'setting' ? 'active' : ''} onClick={() => setTab('setting')}>
+          SETTING
+        </Tab>
       </Tabs>
     </div>
   );

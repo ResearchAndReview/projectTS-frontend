@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { MessageTo, Rect, Task } from '@/types';
-import { afterPaint, createTask, pollTask, requestScreenshot } from './utils';
+import toast from 'react-hot-toast';
+import { MessageTo, RecoveryPayload, Rect, Task } from '@/types';
+import { afterPaint, createTask, pollTask, recoverTask, requestScreenshot } from './utils';
 
 export const useTaskManager = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -14,20 +15,42 @@ export const useTaskManager = () => {
   const requestTask = useCallback(
     async (rect: Rect) => {
       afterPaint(async () => {
-        const image = await requestScreenshot(rect);
-        const taskId = await createTask(image);
+        try {
+          const image = await requestScreenshot(rect);
+          const taskId = await createTask(image);
 
-        const newTask: Task = {
-          id: taskId,
-          image,
-          rect,
-          status: 'pending',
-          captions: [],
-        };
+          const newTask: Task = {
+            id: taskId,
+            image,
+            rect,
+            status: 'pending',
+            captions: [],
+          };
 
-        setTasks((prev) => [...prev, newTask]);
-        startPolling(taskId);
+          setTasks((prev) => [...prev, newTask]);
+          startPolling(taskId);
+        } catch (error) {
+          console.error(error);
+          toast.error('번역 요청에 실패했습니다.');
+        }
       });
+    },
+    [startPolling],
+  );
+
+  /**
+   * Request recovery on OCR failures.
+   */
+  const requestRecovery = useCallback(
+    async (taskId: string, data: RecoveryPayload) => {
+      try {
+        await recoverTask(data);
+        toast.success('재번역 요청을 전송했습니다.');
+        startPolling(taskId);
+      } catch (error) {
+        console.error(error);
+        toast.error('재번역 요청에 실패했습니다.');
+      }
     },
     [startPolling],
   );
@@ -37,6 +60,7 @@ export const useTaskManager = () => {
   return {
     tasks,
     requestTask,
+    requestRecovery,
   };
 };
 
@@ -60,7 +84,7 @@ const useMessageHandler = (tasks: Task[]) => {
 
 const useTaskPolling = (
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>,
-  time: number = 2000,
+  time: number = 1000,
 ) => {
   const pollingRefs = useRef<Record<string, NodeJS.Timeout>>({});
 
@@ -84,19 +108,25 @@ const useTaskPolling = (
       if (pollingRefs.current[taskId]) return;
 
       const interval = setInterval(async () => {
-        const { status, captions } = await pollTask(taskId);
+        if (!taskId) return;
 
-        if (status === 'pending') {
-          return;
+        try {
+          const { status, captions, reason } = await pollTask(taskId);
+
+          if (status === 'error') {
+            toast.error(`번역에 실패했습니다: ${reason}`);
+            stopPolling(taskId);
+            return;
+          }
+
+          setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, status, captions } : t)));
+
+          if (status === 'success') stopPolling(taskId);
+        } catch (error) {
+          console.error(error);
+          toast.error(`번역에 실패했습니다: ${error}`);
+          stopPolling(taskId);
         }
-
-        setTasks((prev) =>
-          prev.map((t) =>
-            t.id === taskId ? { ...t, status, ...(status === 'success' ? { captions } : {}) } : t,
-          ),
-        );
-
-        stopPolling(taskId);
       }, time);
 
       pollingRefs.current[taskId] = interval;

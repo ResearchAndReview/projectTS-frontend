@@ -62,3 +62,9 @@ export type ExtractResponse<T extends MessageType> = MessageMap[T]['response'];
 /** Defines the handler function type for a specific message type. */
 export type MessageHandler<T extends MessageType> =
   ExtractPayload<T> extends undefined ? () => void : (payload: ExtractPayload<T>) => void;
+
+// RESPONSE
+
+export type RuntimeResponse<T, E = unknown> =
+  | { success: true; data: T }
+  | { success: false; error: E };

@@ -1,5 +1,5 @@
 import { Rect } from '../geometry';
-import { Task, TaskPollResponse } from '../task';
+import { RecoveryPayload, Task, TaskPollResponse } from '../task';
 
 export interface MessageMap {
   ENTER_DRAG_MODE: {
@@ -9,7 +9,7 @@ export interface MessageMap {
   };
   CAPTURE_SCREENSHOT: {
     payload: { rect: Rect };
-    response: { screenshot: string };
+    response: { screenshot: string; zoom: number };
     meta: { from: 'content'; to: 'background' };
   };
   CREATE_TASK: {
@@ -26,5 +26,12 @@ export interface MessageMap {
     payload: undefined;
     response: { tasks: Task[] };
     meta: { from: 'popup'; to: 'content' };
+  };
+  RECOVER_TASK: {
+    payload: {
+      data: RecoveryPayload;
+    };
+    response: { message: string };
+    meta: { from: 'content'; to: 'background' };
   };
 }

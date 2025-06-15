@@ -1,30 +1,121 @@
-import { Message, Task } from '@/types';
+import { api } from '@/lib/api';
+import { ENVIRONMENT } from '@/lib/utils';
+import { Message, RecoveryPayload, Task } from '@/types';
+import { TaskPollResponse } from '@/types/task/server';
+import { DevCreateResponse, DevPollResponse, retryTaskMapper, taskResultsMapper } from './utils';
 
 type SendResponse = Parameters<Parameters<typeof chrome.runtime.onMessage.addListener>[0]>[2];
 
 // Handling logics
 
-const captureScreenshot = async (windowId: number, sendResponse: SendResponse) => {
-  const dataUrl = await chrome.tabs.captureVisibleTab(windowId, { format: 'png' });
-  sendResponse({ screenshot: dataUrl });
+const captureScreenshot = async (windowId: number, tabId: number, sendResponse: SendResponse) => {
+  try {
+    const dataUrl = await chrome.tabs.captureVisibleTab(windowId, { format: 'png' });
+    const zoom = await new Promise<number>((resolve) => {
+      chrome.tabs.getZoom(tabId, (zoom) => {
+        resolve(zoom * 100);
+      });
+    });
+
+    sendResponse({ success: true, data: { screenshot: dataUrl, zoom } });
+  } catch (error) {
+    console.error('[captureScreenshot] error:', error);
+    sendResponse({ success: false, error: String(error) });
+  }
 };
 
-const createTask = async (_image: Task['image'], sendResponse: SendResponse) => {
-  sendResponse({ taskId: 'hardcoded-id-for-test' });
-};
+const createTask = async (image: Task['image'], sendResponse: SendResponse) => {
+  if (ENVIRONMENT === 'dev') {
+    sendResponse(DevCreateResponse);
+    return;
+  }
 
-const pollTask = async (_taskId: string, sendResponse: SendResponse) => {
-  sendResponse({
-    status: 'success',
-    captions: [
-      {
-        id: '1',
-        rect: { x: 16, y: 16, width: 32, height: 64 },
-        text: '筆坊は寒い日も布団に入ってはくれぬ。',
-        translation: '후데보는 추운 날에도 이불에 들어와 주지 않는다.',
+  try {
+    // Convert DataURL to Blob
+    const blob = await (await fetch(image)).blob();
+
+    // Build the multipart form data
+    const formData = new FormData();
+    formData.append('request', JSON.stringify({ translateFrom: 'ja-JP', translateTo: 'ko-KR' }));
+    formData.append('file', blob);
+
+    // Make the API request
+    const { createdTaskId } = await api<{ createdTaskId: string }>({
+      method: 'post',
+      url: 'task/create',
+      options: {
+        body: formData,
       },
-    ],
-  });
+      body: 'json',
+    });
+
+    sendResponse({ success: true, data: { taskId: createdTaskId } });
+  } catch (error) {
+    console.error('[createTask] error:', error);
+    sendResponse({ success: false, error: String(error) });
+  }
+};
+
+const pollTask = async (taskId: string, sendResponse: SendResponse) => {
+  if (ENVIRONMENT === 'dev') {
+    sendResponse(DevPollResponse);
+    return;
+  }
+
+  try {
+    const result = await api<TaskPollResponse>({
+      method: 'get',
+      url: 'task/status',
+      options: { searchParams: { taskId } },
+    });
+
+    if (result.status === 'pending' || result.status === 'success') {
+      const { status, taskResults } = result as TaskPollResponse<'pending' | 'success'>;
+
+      sendResponse({
+        success: true,
+        data: { status, captions: taskResults.map(taskResultsMapper), reason: undefined },
+      });
+
+      return;
+    }
+
+    if (result.status === 'failed') {
+      const { task } = result as TaskPollResponse<'failed'>;
+
+      sendResponse({
+        success: true,
+        data: { status: 'error', captions: [], reason: task.failCause },
+      });
+
+      return;
+    }
+
+    throw new Error(`Unexpected status: ${result.status}`);
+  } catch (error) {
+    console.error('[pollTask] error', error);
+    sendResponse({ success: false, error: String(error) });
+  }
+};
+
+const recoverTask = async (data: RecoveryPayload, sendResponse: SendResponse) => {
+  if (ENVIRONMENT === 'dev') {
+    sendResponse({ success: true, data: { message: JSON.stringify(data) } });
+    return;
+  }
+
+  try {
+    const { message } = await api<{ message: string }>({
+      method: 'post',
+      url: 'task/recovery-list',
+      options: { json: data.map(retryTaskMapper) },
+    });
+
+    sendResponse({ success: true, data: { message } });
+  } catch (error) {
+    console.error('[retryTranslation] error:', error);
+    sendResponse({ success: false, error: String(error) });
+  }
 };
 
 // Content message handler (call appropriate logic for each message)
@@ -43,7 +134,7 @@ export const handleContentMessages = (
 
   switch (type) {
     case 'CAPTURE_SCREENSHOT':
-      captureScreenshot(sender.tab.windowId, sendResponse);
+      captureScreenshot(sender.tab.windowId, sender.tab.id, sendResponse);
       return true;
 
     case 'CREATE_TASK':
@@ -52,6 +143,11 @@ export const handleContentMessages = (
 
     case 'POLL_TASK': {
       pollTask(payload.taskId, sendResponse);
+      return true;
+    }
+
+    case 'RECOVER_TASK': {
+      recoverTask(payload.data, sendResponse);
       return true;
     }
 

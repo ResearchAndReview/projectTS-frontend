@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
+import { sendTabMessage } from '@/lib/utils';
 import { Task } from '@/types';
-import { sendTabMessage } from '@/utils/message';
 
 export const useTasksFromAllTabs = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -30,7 +30,7 @@ export const useTasksFromAllTabs = () => {
       }),
     );
 
-    setTasks(allTasks);
+    setTasks(allTasks.reverse());
   };
 
   /** Fetch tasks immediately when the hook is mounted. */

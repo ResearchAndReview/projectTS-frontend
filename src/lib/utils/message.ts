@@ -1,4 +1,4 @@
-import { ExtractPayload, ExtractResponse, MessageType } from '@/types';
+import { ExtractPayload, ExtractResponse, MessageType, RuntimeResponse } from '@/types';
 
 export const sendRuntimeMessage = async <T extends MessageType>({
   type,
@@ -6,8 +6,11 @@ export const sendRuntimeMessage = async <T extends MessageType>({
 }: {
   type: T;
   payload: ExtractPayload<T>;
-}): Promise<ExtractResponse<T>> => {
-  return chrome.runtime.sendMessage<{ type: T; payload: ExtractPayload<T> }, ExtractResponse<T>>({
+}): Promise<RuntimeResponse<ExtractResponse<T>>> => {
+  return chrome.runtime.sendMessage<
+    { type: T; payload: ExtractPayload<T> },
+    RuntimeResponse<ExtractResponse<T>>
+  >({
     type,
     payload,
   });

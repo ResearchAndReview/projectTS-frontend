@@ -1,16 +1,18 @@
-import { Rect, Task, TaskPollResponse } from '@/types';
-import { sendRuntimeMessage } from '@/utils/message';
+import { sendRuntimeMessage } from '@/lib/utils';
+import { RecoveryPayload, Rect, Task, TaskPollResponse } from '@/types';
 
 /**
  * Submits the cropped image and returns the created task ID.
  */
 export const createTask = async (image: Task['image']) => {
-  const { taskId } = await sendRuntimeMessage({
+  const response = await sendRuntimeMessage({
     type: 'CREATE_TASK',
     payload: { image },
   });
 
-  return taskId;
+  if (response.success) return response.data.taskId;
+
+  throw response.error;
 };
 
 /**
@@ -22,32 +24,55 @@ export const pollTask = async (taskId: string): Promise<TaskPollResponse> => {
     payload: { taskId },
   });
 
-  return response;
+  if (response.success) return response.data;
+
+  throw response.error;
+};
+
+/**
+ * Submits task recovery request and returns the task ID back.
+ */
+export const recoverTask = async (data: RecoveryPayload) => {
+  const response = await sendRuntimeMessage({
+    type: 'RECOVER_TASK',
+    payload: { data },
+  });
+
+  if (response.success) return response.data.message;
+
+  throw response.error;
 };
 
 /**
  * Requests a screenshot and crops it to the specified rect.
  */
 export const requestScreenshot = async (rect: Rect) => {
-  const { screenshot } = await sendRuntimeMessage({
+  const response = await sendRuntimeMessage({
     type: 'CAPTURE_SCREENSHOT',
     payload: { rect },
   });
 
-  return await cropImage(screenshot, rect);
+  if (response.success) {
+    const { screenshot, zoom } = response.data;
+    return await cropAndResizeImage(screenshot, rect, zoom);
+  }
+
+  throw response.error;
 };
 
 /**
- * Crops a rectangular area from the given data URL image.
+ * Crops and resizes a rectangular region from the given image in one step.
  *
  * @param dataUrl - The source image as a data URL (e.g., from a screenshot).
  * @param rect - The rectangular region to crop { x, y, width, height }.
- * @param dpr - (Optional) Device pixel ratio to handle high-DPI screens (defaults to window.devicePixelRatio).
- * @returns A Promise that resolves with the cropped image.
+ * @param zoomPercent - The zoom percentage (e.g., 80 means scale up to 125%).
+ * @param dpr - (Optional) Device pixel ratio (default = window.devicePixelRatio).
+ * @returns A Promise that resolves to the final resized image (as data URL).
  */
-const cropImage = (
+export const cropAndResizeImage = (
   dataUrl: string,
   rect: Rect,
+  zoomPercent: number,
   dpr: number = window.devicePixelRatio,
 ): Promise<Task['image']> =>
   new Promise((resolve, reject) => {
@@ -55,29 +80,35 @@ const cropImage = (
     img.src = dataUrl;
 
     img.onload = () => {
+      const scale = 100 / zoomPercent;
+
       const canvas = document.createElement('canvas');
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
+      canvas.width = rect.width * scale; // should ignore dpr
+      canvas.height = rect.height * scale;
 
       const ctx = canvas.getContext('2d')!;
       ctx.drawImage(
         img,
         rect.x * dpr,
-        rect.y * dpr,
+        (rect.y - window.scrollY) * dpr,
         rect.width * dpr,
         rect.height * dpr,
         0,
         0,
-        rect.width * dpr,
-        rect.height * dpr,
+        canvas.width,
+        canvas.height,
       );
 
       try {
-        const dataUrl = canvas.toDataURL('image/png');
-        resolve(dataUrl);
+        const resizedDataUrl = canvas.toDataURL('image/png');
+        resolve(resizedDataUrl);
       } catch {
-        reject(new Error('cropImage: failed to create a data URL.'));
+        reject(new Error('cropAndResizeImage: failed to create a data URL.'));
       }
+    };
+
+    img.onerror = () => {
+      reject(new Error('cropAndResizeImage: failed to load image.'));
     };
   });
 
