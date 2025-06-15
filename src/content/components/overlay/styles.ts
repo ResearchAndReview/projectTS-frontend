@@ -93,7 +93,7 @@ export const NoteBody = styled.div<{ hover: boolean }>`
   padding: 4px 8px;
   font-size: 13px;
 
-  max-width: 100%;
+  width: max-content;
   word-wrap: break-word;
   overflow-wrap: break-word;
   white-space: normal;

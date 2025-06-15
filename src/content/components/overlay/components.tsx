@@ -81,7 +81,7 @@ export const Note = ({ rect, translation, onClick, fontSize, displayMode }: Note
   );
 };
 
-const NoteBody = ({ translation, hover, fontSize }: NoteBodyProps) => {
+const NoteBody = ({ rect, translation, hover, fontSize }: NoteBodyProps) => {
   const top = 0;
   const left = 0;
   const size =
@@ -92,7 +92,10 @@ const NoteBody = ({ translation, hover, fontSize }: NoteBodyProps) => {
     ].find(({ key }) => key === fontSize)?.size ?? 13;
 
   return (
-    <NoteBodyComponent hover={hover} style={{ top, left, fontSize: size }}>
+    <NoteBodyComponent
+      hover={hover}
+      style={{ top, left, fontSize: size, maxWidth: `${rect.width + 64}px` }}
+    >
       {translation}
     </NoteBodyComponent>
   );
