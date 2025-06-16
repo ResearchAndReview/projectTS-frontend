@@ -39,14 +39,35 @@ export const Frame = styled.div<{ loading?: boolean }>`
 
 export const FrameCloseButton = styled.button`
   position: absolute;
-  top: 2px;
-  right: 2px;
-  background: transparent;
-  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: -16px;
+  left: -16px;
+  width: 28px;
+  height: 28px;
   font-size: 18px;
+  line-height: 0.9;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  margin: 4px;
+  background: #7300ff;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
+  z-index: 2;
+
+  > span {
+    transform: translateY(-1px);
+  }
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  transition: transform 0.2s ease;
 `;
 
 export const Note = styled.div`

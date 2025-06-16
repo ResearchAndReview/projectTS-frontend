@@ -43,7 +43,9 @@ export const Frame = ({ rect, children, loading }: FrameProps) => {
 
   return (
     <FrameComponent style={{ top, left, width: rect.width, height: rect.height }} loading={loading}>
-      <FrameCloseButton onClick={() => setClosed(true)}>×</FrameCloseButton>
+      <FrameCloseButton onClick={() => setClosed(true)}>
+        <span>×</span>
+      </FrameCloseButton>
       {children}
     </FrameComponent>
   );
